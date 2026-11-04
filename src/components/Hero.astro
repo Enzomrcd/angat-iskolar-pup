@@ -1,0 +1,26 @@
+---
+// src/components/Hero.astro
+interface Props {
+  title: string;
+}
+
+const { title } = Astro.props;
+---
+
+<div class="relative w-full h-[500px] md:h-[600px] aip-hero-gradient flex items-end pb-24 px-8 md:px-12">
+    <!-- Wavy divider -->
+    <div class="absolute bottom-0 left-0 w-full overflow-hidden leading-none transform translate-y-[2px]">
+        <svg class="relative block w-full h-[60px] md:h-[100px]" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 120" preserveAspectRatio="none">
+            <path d="M321.39,56.44c58-10.79,114.16-30.13,172-41.86,82.39-16.72,168.19-17.73,250.45-.39C823.78,31,906.67,72,985.66,92.83c70.05,18.48,146.53,26.09,214.34,3V120H0V0C73.83,39.98,160.77,65.34,233.7,70.93,262.14,73.08,291.56,71.18,321.39,56.44Z" fill="#ffffff"></path>
+        </svg>
+    </div>
+
+    <!-- Hero Text -->
+    <div class="relative z-10 text-white max-w-4xl">
+        <h1 class="text-3xl md:text-5xl lg:text-6xl mb-2 font-bold tracking-wide uppercase leading-tight">
+            {title}
+        </h1>
+        <!-- Slot allows us to insert subtitles below the title on specific pages -->
+        <slot /> 
+    </div>
+</div>

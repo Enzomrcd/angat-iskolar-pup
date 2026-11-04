@@ -1,0 +1,31 @@
+@import "tailwindcss";
+
+@theme {
+  /* AIP Brand Colors */
+  --color-aip-plum: #902045;
+  --color-aip-raspberry: #e12b6c;
+  --color-aip-cerise: #e4417b;
+  --color-aip-punch: #ff5276;
+  --color-aip-white: #ffffff;
+
+  /* Typography */
+  --font-poppins: 'Poppins', sans-serif;
+  --font-gotham: 'Gotham', sans-serif;
+}
+
+@layer base {
+  body {
+    /* Set Gotham as the default body font with Pure White background */
+    @apply font-gotham text-gray-900 bg-aip-white antialiased;
+  }
+  
+  /* Apply Poppins Bold strictly to headings */
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-poppins font-bold;
+  }
+}
+
+/* Reusable Hero Gradient matching the Canva reference perfectly */
+.aip-hero-gradient {
+  background: linear-gradient(135deg, rgba(144, 32, 69, 0.9) 0%, rgba(225, 43, 108, 0.75) 50%, rgba(144, 32, 69, 0.9) 100%);
+}

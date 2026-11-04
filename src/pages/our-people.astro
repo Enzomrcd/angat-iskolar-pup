@@ -1,0 +1,20 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Hero from '../components/Hero.astro';
+---
+
+<BaseLayout title="Our People | Angat Iskolar PUP">
+    <Hero title="OUR PEOPLE" />
+
+    <!-- People Hierarchy Section (on white background) -->
+    <div class="max-w-6xl mx-auto px-6 py-16 flex flex-col items-center bg-transparent">
+        <div class="bg-gradient-to-r from-aip-cerise to-aip-punch text-white px-8 py-2 rounded-full shadow-md mb-16">
+            <h2 class="text-lg md:text-xl font-bold tracking-wider">[Term Year Pending]</h2>
+        </div>
+        
+        <div class="text-gray-700 text-center border-2 border-dashed border-gray-300 rounded-2xl p-12 w-full max-w-4xl">
+            <p class="text-xl font-bold">[Content Pending from CMS]</p>
+            <p class="mt-2 text-gray-500">The hierarchical portrait pyramid will be dynamically generated here based on the active term.</p>
+        </div>
+    </div>
+</BaseLayout>
