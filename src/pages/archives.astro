@@ -1,15 +1,60 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Hero from '../components/Hero.astro';
+import { getCollection } from 'astro:content';
+
+// Fetch all entries from the 'archives' collection
+const allArchives = await getCollection('archives');
+
+// Sort archives by year (newest first)
+const sortedArchives = allArchives.sort((a, b) => {
+    return parseInt(b.data.year) - parseInt(a.data.year);
+});
 ---
 
 <BaseLayout title="Archives | Angat Iskolar PUP">
     <Hero title="ARCHIVES" />
 
-    <div class="max-w-4xl mx-auto px-6 py-16 text-center bg-transparent">
-        <div class="border-2 border-dashed border-gray-300 rounded-2xl p-12">
-            <p class="text-xl font-bold text-gray-700">[Content Pending from CMS]</p>
-            <p class="mt-2 text-gray-500">This page is awaiting its final design and CMS data integration.</p>
-        </div>
+    <div class="max-w-5xl mx-auto px-6 py-16 flex flex-col items-center bg-transparent">
+        
+        {sortedArchives.length === 0 ? (
+            <div class="text-gray-700 text-center border-2 border-dashed border-gray-300 rounded-2xl p-12 w-full max-w-4xl">
+                <p class="text-xl font-bold">[Content Pending from CMS]</p>
+                <p class="mt-2 text-gray-500">Official reports and documents will be dynamically generated here.</p>
+            </div>
+        ) : (
+            <div class="w-full flex flex-col gap-6">
+                {sortedArchives.map((archive, index) => (
+                    <a href={archive.data.document} target="_blank" rel="noopener noreferrer" class={`animate-fade-in-up delay-${(index % 4) * 100} group flex flex-col md:flex-row items-start md:items-center justify-between p-6 md:p-8 bg-white rounded-2xl shadow-md border border-gray-200 hover:border-aip-cerise hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1`}>
+                        
+                        <div class="flex items-center gap-6 mb-4 md:mb-0">
+                            <div class="bg-gray-100 p-4 rounded-full group-hover:bg-aip-cerise/10 transition-colors duration-300">
+                                <svg class="w-8 h-8 text-gray-500 group-hover:text-aip-cerise transition-colors duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+                                </svg>
+                            </div>
+                            
+                            <div>
+                                <h3 class="text-xl font-bold text-gray-900 group-hover:text-aip-cerise transition-colors duration-300">{archive.data.title}</h3>
+                                <div class="flex items-center gap-3 mt-1 text-sm font-semibold text-gray-500">
+                                    <span class="bg-gray-200 text-gray-700 px-2 py-0.5 rounded uppercase text-xs tracking-wider">{archive.data.category}</span>
+                                    <span>•</span>
+                                    <span>{archive.data.year}</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="flex-shrink-0 w-full md:w-auto text-center md:text-right">
+                            <span class="inline-flex items-center justify-center gap-2 bg-aip-plum text-white px-6 py-2 rounded-full font-bold shadow-md group-hover:bg-aip-cerise transition-colors duration-300 w-full md:w-auto">
+                                View Document
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
+                                </svg>
+                            </span>
+                        </div>
+                    </a>
+                ))}
+            </div>
+        )}
     </div>
 </BaseLayout>

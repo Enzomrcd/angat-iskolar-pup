@@ -1,15 +1,512 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Hero from '../components/Hero.astro';
+
+const executiveOfficers = [
+    {
+        badge: "Executive Head",
+        title: "Lead Convener",
+        description: "Provides overall strategic vision, represents ANGAT Iskolar PUP in university-wide and external engagements, and presides over executive deliberations."
+    },
+    {
+        badge: "Operations & Programs",
+        title: "Deputy Lead Convener for Internal & External Affairs",
+        description: "Oversees inter-committee coordination, external partnerships, coalition building, and alignment of flagship programs with organizational goals."
+    },
+    {
+        badge: "Documentation & Records",
+        title: "Secretary-General",
+        description: "Manages official correspondence, administrative records, meeting minutes, membership databases, and institutional documentation."
+    },
+    {
+        badge: "Finance & Logistics",
+        title: "Finance & Resource Mobilization Officer",
+        description: "Stewards organizational funds, oversees budgeting and financial transparency, and leads fundraising and partnership resource drives."
+    },
+    {
+        badge: "Communications & Creatives",
+        title: "Public Information & Creatives Officer",
+        description: "Directs brand identity, digital storytelling, publication materials, and public advocacy campaigns across official platforms."
+    }
+];
+
+const standingCommittees = [
+    {
+        badge: "Advocacy Pillar",
+        title: "Committee on Education",
+        description: "Champions accessible, inclusive, and transformative learning through tutorial drives, literacy projects, and academic support initiatives."
+    },
+    {
+        badge: "Advocacy Pillar",
+        title: "Committee on Environmental & Agricultural Development",
+        description: "Leads ecological stewardship, coastal and campus cleanups, sustainability campaigns, and community-based agricultural support."
+    },
+    {
+        badge: "Advocacy Pillar",
+        title: "Committee on Gender Equality & Social Harmony",
+        description: "Promotes safe spaces, gender sensitivity, intersectional inclusivity, and solidarity campaigns for marginalized sectors."
+    },
+    {
+        badge: "Advocacy Pillar",
+        title: "Committee on Good Governance",
+        description: "Fosters civic awareness, youth political participation, ethical leadership, and accountable student-led public service."
+    },
+    {
+        badge: "Advocacy Pillar",
+        title: "Committee on Health",
+        description: "Advances holistic physical and mental well-being through health education, medical outreach, and community wellness programs."
+    }
+];
+
+const committeeOfficers = [
+    {
+        badge: "Committee Leadership",
+        title: "Committee Chairperson",
+        description: "Leads the planning, execution, and evaluation of committee-specific initiatives while representing the committee in the Executive Council."
+    },
+    {
+        badge: "Committee Operations",
+        title: "Vice Chairperson for Programs & Logistics",
+        description: "Coordinates project timelines, venue and resource logistics, and on-ground volunteer deployment for committee activities."
+    },
+    {
+        badge: "Committee Records",
+        title: "Committee Secretary & Documentation Head",
+        description: "Maintains committee attendance, project proposals, post-event impact reports, and coordination notes with the Secretariat."
+    },
+    {
+        badge: "Volunteer Engagement",
+        title: "Committee Member / Volunteer",
+        description: "Actively participates in project conceptualization, community immersion, and grassroots mobilization across AIP's advocacies."
+    }
+];
 ---
 
 <BaseLayout title="AIP Community | Angat Iskolar PUP">
-    <Hero title="AIP COMMUNITY" />
+    <Hero title="AIP COMMUNITY">
+        <p class="text-lg md:text-2xl font-light italic mt-3 opacity-95 tracking-wide">
+            Organizational Structure, Roles, and Standing Committees
+        </p>
+    </Hero>
 
-    <div class="max-w-4xl mx-auto px-6 py-16 text-center bg-transparent">
-        <div class="border-2 border-dashed border-gray-300 rounded-2xl p-12">
-            <p class="text-xl font-bold text-gray-700">[Content Pending from CMS]</p>
-            <p class="mt-2 text-gray-500">This page is awaiting its final design and CMS data integration.</p>
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-14 md:py-20 flex flex-col items-center bg-transparent">
+        
+        <!-- Top Section Switcher Bar (Prevents Long Vertical Scroll Across Tiers) -->
+        <div class="w-full max-w-4xl flex flex-col sm:flex-row items-center justify-between gap-3 bg-white p-2.5 rounded-3xl sm:rounded-full shadow-md border border-gray-100 mb-12">
+            <div class="flex flex-wrap justify-center gap-1.5 w-full sm:w-auto">
+                <button
+                    type="button"
+                    data-tier-tab="0"
+                    class="tier-tab-btn px-4 sm:px-6 py-2.5 rounded-full text-xs sm:text-sm font-bold uppercase tracking-wider transition-all duration-300 bg-aip-cerise text-white shadow-sm cursor-pointer"
+                >
+                    Executive Officers
+                </button>
+                <button
+                    type="button"
+                    data-tier-tab="1"
+                    class="tier-tab-btn px-4 sm:px-6 py-2.5 rounded-full text-xs sm:text-sm font-bold uppercase tracking-wider transition-all duration-300 bg-transparent text-gray-600 hover:text-aip-plum hover:bg-gray-50 cursor-pointer"
+                >
+                    Standing Committees
+                </button>
+                <button
+                    type="button"
+                    data-tier-tab="2"
+                    class="tier-tab-btn px-4 sm:px-6 py-2.5 rounded-full text-xs sm:text-sm font-bold uppercase tracking-wider transition-all duration-300 bg-transparent text-gray-600 hover:text-aip-plum hover:bg-gray-50 cursor-pointer"
+                >
+                    Committee Officers
+                </button>
+            </div>
+
+            <div class="flex items-center gap-2 pr-1">
+                <span id="tier-counter" class="text-xs font-bold text-gray-400 tracking-widest px-2">
+                    1 / 3
+                </span>
+                <button
+                    type="button"
+                    id="tier-prev-btn"
+                    aria-label="Previous section"
+                    class="w-9 h-9 rounded-full bg-gray-100 text-gray-700 hover:bg-aip-plum hover:text-white flex items-center justify-center transition-all duration-200 active:scale-95 touch-manipulation cursor-pointer"
+                >
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7" />
+                    </svg>
+                </button>
+                <button
+                    type="button"
+                    id="tier-next-btn"
+                    aria-label="Next section"
+                    class="w-9 h-9 rounded-full bg-gray-100 text-gray-700 hover:bg-aip-plum hover:text-white flex items-center justify-center transition-all duration-200 active:scale-95 touch-manipulation cursor-pointer"
+                >
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7" />
+                    </svg>
+                </button>
+            </div>
         </div>
+
+        <!-- SECTION 1: EXECUTIVE OFFICERS -->
+        <section data-tier-panel class="w-full flex flex-col items-center animate-fade-in-up">
+            <div class="text-center max-w-2xl mb-10">
+                <div class="inline-block bg-gradient-to-r from-aip-cerise to-aip-raspberry text-white font-bold px-8 py-3 rounded-full uppercase tracking-wider text-base sm:text-lg shadow-md mb-4">
+                    Executive Officers
+                </div>
+                <p class="text-gray-600 text-sm sm:text-base leading-relaxed">
+                    The central governing body overseeing organizational strategies, program approvals, and high-level policy execution.
+                </p>
+            </div>
+
+            <!-- Mobile Card Carousel Controls -->
+            <div data-card-carousel class="w-full">
+                <div class="md:hidden flex items-center justify-between bg-white border border-gray-200 rounded-full px-4 py-2 shadow-sm mb-6 max-w-sm mx-auto">
+                    <button
+                        type="button"
+                        data-card-prev
+                        aria-label="Previous role"
+                        class="w-9 h-9 rounded-full bg-gray-100 text-gray-800 hover:bg-aip-cerise hover:text-white flex items-center justify-center transition-colors active:scale-95 touch-manipulation cursor-pointer"
+                    >
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7" />
+                        </svg>
+                    </button>
+
+                    <div class="flex flex-col items-center">
+                        <span data-card-counter class="text-xs font-bold text-aip-plum tracking-wider">
+                            1 / {executiveOfficers.length}
+                        </span>
+                        <div class="flex items-center gap-1 mt-1">
+                            {executiveOfficers.map((_, i) => (
+                                <button
+                                    type="button"
+                                    data-card-dot={i}
+                                    aria-label={`Role ${i + 1}`}
+                                    class={`h-1.5 rounded-full transition-all duration-300 cursor-pointer ${i === 0 ? 'w-4 bg-aip-cerise' : 'w-1.5 bg-gray-300'}`}
+                                />
+                            ))}
+                        </div>
+                    </div>
+
+                    <button
+                        type="button"
+                        data-card-next
+                        aria-label="Next role"
+                        class="w-9 h-9 rounded-full bg-gray-100 text-gray-800 hover:bg-aip-cerise hover:text-white flex items-center justify-center transition-colors active:scale-95 touch-manipulation cursor-pointer"
+                    >
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7" />
+                        </svg>
+                    </button>
+                </div>
+
+                <!-- Cards Track (Single Slide on Mobile, Multi-Column Grid on Desktop) -->
+                <div data-card-track class="w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
+                    {executiveOfficers.map((officer, idx) => (
+                        <div
+                            data-card-slide
+                            class={`${idx === 0 ? 'flex' : 'hidden md:flex'} flex-col justify-between bg-white rounded-3xl p-7 sm:p-8 shadow-lg border border-gray-100 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 min-h-[240px]`}
+                        >
+                            <div>
+                                <span class="inline-block bg-aip-cerise/10 text-aip-cerise text-xs font-bold px-3.5 py-1 rounded-full uppercase tracking-wider mb-4">
+                                    {officer.badge}
+                                </span>
+                                <h3 class="text-xl sm:text-2xl font-bold text-gray-900 mb-3 leading-snug">
+                                    {officer.title}
+                                </h3>
+                                <p class="text-gray-600 text-sm sm:text-base leading-relaxed">
+                                    {officer.description}
+                                </p>
+                            </div>
+                            <div class="mt-6 pt-4 border-t border-gray-100 flex items-center justify-between text-xs font-semibold text-gray-400">
+                                <span>Executive Council</span>
+                                <span>0{idx + 1}</span>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 2: STANDING COMMITTEES -->
+        <section data-tier-panel class="hidden w-full flex-col items-center animate-fade-in-up">
+            <div class="text-center max-w-2xl mb-10">
+                <div class="inline-block bg-gradient-to-r from-aip-plum to-aip-cerise text-white font-bold px-8 py-3 rounded-full uppercase tracking-wider text-base sm:text-lg shadow-md mb-4">
+                    Standing Committees
+                </div>
+                <p class="text-gray-600 text-sm sm:text-base leading-relaxed">
+                    The five core advocacy arms driving grassroots projects, community partnerships, and volunteer mobilization across PUP.
+                </p>
+            </div>
+
+            <div data-card-carousel class="w-full">
+                <div class="md:hidden flex items-center justify-between bg-white border border-gray-200 rounded-full px-4 py-2 shadow-sm mb-6 max-w-sm mx-auto">
+                    <button
+                        type="button"
+                        data-card-prev
+                        aria-label="Previous committee"
+                        class="w-9 h-9 rounded-full bg-gray-100 text-gray-800 hover:bg-aip-plum hover:text-white flex items-center justify-center transition-colors active:scale-95 touch-manipulation cursor-pointer"
+                    >
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7" />
+                        </svg>
+                    </button>
+
+                    <div class="flex flex-col items-center">
+                        <span data-card-counter class="text-xs font-bold text-aip-plum tracking-wider">
+                            1 / {standingCommittees.length}
+                        </span>
+                        <div class="flex items-center gap-1 mt-1">
+                            {standingCommittees.map((_, i) => (
+                                <button
+                                    type="button"
+                                    data-card-dot={i}
+                                    aria-label={`Committee ${i + 1}`}
+                                    class={`h-1.5 rounded-full transition-all duration-300 cursor-pointer ${i === 0 ? 'w-4 bg-aip-plum' : 'w-1.5 bg-gray-300'}`}
+                                />
+                            ))}
+                        </div>
+                    </div>
+
+                    <button
+                        type="button"
+                        data-card-next
+                        aria-label="Next committee"
+                        class="w-9 h-9 rounded-full bg-gray-100 text-gray-800 hover:bg-aip-plum hover:text-white flex items-center justify-center transition-colors active:scale-95 touch-manipulation cursor-pointer"
+                    >
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7" />
+                        </svg>
+                    </button>
+                </div>
+
+                <div data-card-track class="w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
+                    {standingCommittees.map((committee, idx) => (
+                        <div
+                            data-card-slide
+                            class={`${idx === 0 ? 'flex' : 'hidden md:flex'} flex-col justify-between bg-white rounded-3xl p-7 sm:p-8 shadow-lg border border-gray-100 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 min-h-[240px]`}
+                        >
+                            <div>
+                                <span class="inline-block bg-aip-plum/10 text-aip-plum text-xs font-bold px-3.5 py-1 rounded-full uppercase tracking-wider mb-4">
+                                    {committee.badge}
+                                </span>
+                                <h3 class="text-xl sm:text-2xl font-bold text-gray-900 mb-3 leading-snug">
+                                    {committee.title}
+                                </h3>
+                                <p class="text-gray-600 text-sm sm:text-base leading-relaxed">
+                                    {committee.description}
+                                </p>
+                            </div>
+                            <div class="mt-6 pt-4 border-t border-gray-100 flex items-center justify-between text-xs font-semibold text-gray-400">
+                                <span>Standing Committee</span>
+                                <span>0{idx + 1}</span>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 3: COMMITTEE OFFICERS -->
+        <section data-tier-panel class="hidden w-full flex-col items-center animate-fade-in-up">
+            <div class="text-center max-w-2xl mb-10">
+                <div class="inline-block bg-gradient-to-r from-aip-raspberry to-aip-punch text-white font-bold px-8 py-3 rounded-full uppercase tracking-wider text-base sm:text-lg shadow-md mb-4">
+                    Committee Officers
+                </div>
+                <p class="text-gray-600 text-sm sm:text-base leading-relaxed">
+                    The dedicated student leaders and volunteers executing committee-level programs and community immersions.
+                </p>
+            </div>
+
+            <div data-card-carousel class="w-full">
+                <div class="md:hidden flex items-center justify-between bg-white border border-gray-200 rounded-full px-4 py-2 shadow-sm mb-6 max-w-sm mx-auto">
+                    <button
+                        type="button"
+                        data-card-prev
+                        aria-label="Previous committee role"
+                        class="w-9 h-9 rounded-full bg-gray-100 text-gray-800 hover:bg-aip-cerise hover:text-white flex items-center justify-center transition-colors active:scale-95 touch-manipulation cursor-pointer"
+                    >
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7" />
+                        </svg>
+                    </button>
+
+                    <div class="flex flex-col items-center">
+                        <span data-card-counter class="text-xs font-bold text-aip-plum tracking-wider">
+                            1 / {committeeOfficers.length}
+                        </span>
+                        <div class="flex items-center gap-1 mt-1">
+                            {committeeOfficers.map((_, i) => (
+                                <button
+                                    type="button"
+                                    data-card-dot={i}
+                                    aria-label={`Committee role ${i + 1}`}
+                                    class={`h-1.5 rounded-full transition-all duration-300 cursor-pointer ${i === 0 ? 'w-4 bg-aip-cerise' : 'w-1.5 bg-gray-300'}`}
+                                />
+                            ))}
+                        </div>
+                    </div>
+
+                    <button
+                        type="button"
+                        data-card-next
+                        aria-label="Next committee role"
+                        class="w-9 h-9 rounded-full bg-gray-100 text-gray-800 hover:bg-aip-cerise hover:text-white flex items-center justify-center transition-colors active:scale-95 touch-manipulation cursor-pointer"
+                    >
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7" />
+                        </svg>
+                    </button>
+                </div>
+
+                <div data-card-track class="w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    {committeeOfficers.map((role, idx) => (
+                        <div
+                            data-card-slide
+                            class={`${idx === 0 ? 'flex' : 'hidden md:flex'} flex-col justify-between bg-white rounded-3xl p-7 shadow-lg border border-gray-100 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 min-h-[240px]`}
+                        >
+                            <div>
+                                <span class="inline-block bg-aip-cerise/10 text-aip-cerise text-xs font-bold px-3.5 py-1 rounded-full uppercase tracking-wider mb-4">
+                                    {role.badge}
+                                </span>
+                                <h3 class="text-xl font-bold text-gray-900 mb-3 leading-snug">
+                                    {role.title}
+                                </h3>
+                                <p class="text-gray-600 text-sm leading-relaxed">
+                                    {role.description}
+                                </p>
+                            </div>
+                            <div class="mt-6 pt-4 border-t border-gray-100 flex items-center justify-between text-xs font-semibold text-gray-400">
+                                <span>Committee Structure</span>
+                                <span>0{idx + 1}</span>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            </div>
+        </section>
+
+        <!-- Bottom Swipe Hint for Mobile -->
+        <p class="md:hidden text-xs text-gray-400 font-medium mt-6 text-center">
+            Swipe cards left or right, or use the arrows above to browse roles
+        </p>
+
     </div>
 </BaseLayout>
+
+<script>
+    document.addEventListener('astro:page-load', () => {
+        // 1. Top Organizational Tier Switcher (Executive Officers / Standing Committees / Committee Officers)
+        const tierTabs = document.querySelectorAll('.tier-tab-btn');
+        const tierPanels = document.querySelectorAll('[data-tier-panel]');
+        const tierPrevBtn = document.getElementById('tier-prev-btn');
+        const tierNextBtn = document.getElementById('tier-next-btn');
+        const tierCounter = document.getElementById('tier-counter');
+
+        let currentTier = 0;
+
+        const showTier = (index: number) => {
+            const total = tierPanels.length;
+            if (total === 0) return;
+            currentTier = ((index % total) + total) % total;
+
+            tierPanels.forEach((panel, idx) => {
+                if (idx === currentTier) {
+                    panel.classList.remove('hidden');
+                    panel.classList.add('flex');
+                } else {
+                    panel.classList.add('hidden');
+                    panel.classList.remove('flex');
+                }
+            });
+
+            tierTabs.forEach((tab, idx) => {
+                if (idx === currentTier) {
+                    tab.classList.remove('bg-transparent', 'text-gray-600', 'hover:text-aip-plum', 'hover:bg-gray-50');
+                    tab.classList.add('bg-aip-cerise', 'text-white', 'shadow-sm');
+                } else {
+                    tab.classList.remove('bg-aip-cerise', 'text-white', 'shadow-sm');
+                    tab.classList.add('bg-transparent', 'text-gray-600', 'hover:text-aip-plum', 'hover:bg-gray-50');
+                }
+            });
+
+            if (tierCounter) {
+                tierCounter.textContent = `${currentTier + 1} / ${total}`;
+            }
+        };
+
+        tierTabs.forEach((tab, idx) => {
+            tab.addEventListener('click', () => showTier(idx));
+        });
+        tierPrevBtn?.addEventListener('click', () => showTier(currentTier - 1));
+        tierNextBtn?.addEventListener('click', () => showTier(currentTier + 1));
+
+        // 2. Per-Section Mobile Card Carousels (with Touch Swipe)
+        const carousels = document.querySelectorAll('[data-card-carousel]');
+        carousels.forEach((carousel) => {
+            const slides = carousel.querySelectorAll('[data-card-slide]');
+            if (slides.length <= 1) return;
+
+            const prevBtn = carousel.querySelector('[data-card-prev]');
+            const nextBtn = carousel.querySelector('[data-card-next]');
+            const counter = carousel.querySelector('[data-card-counter]');
+            const dots = carousel.querySelectorAll('[data-card-dot]');
+            const track = carousel.querySelector('[data-card-track]') as HTMLElement | null;
+
+            let currentCard = 0;
+
+            const showCard = (index: number) => {
+                const total = slides.length;
+                currentCard = ((index % total) + total) % total;
+
+                slides.forEach((slide, idx) => {
+                    if (idx === currentCard) {
+                        slide.classList.remove('hidden');
+                        slide.classList.add('flex');
+                    } else {
+                        slide.classList.add('hidden');
+                        slide.classList.remove('flex');
+                        slide.classList.add('md:flex');
+                    }
+                });
+
+                if (counter) {
+                    counter.textContent = `${currentCard + 1} / ${total}`;
+                }
+
+                dots.forEach((dot, idx) => {
+                    if (idx === currentCard) {
+                        dot.classList.remove('w-1.5', 'bg-gray-300');
+                        dot.classList.add('w-4', 'bg-aip-cerise');
+                    } else {
+                        dot.classList.remove('w-4', 'bg-aip-cerise');
+                        dot.classList.add('w-1.5', 'bg-gray-300');
+                    }
+                });
+            };
+
+            prevBtn?.addEventListener('click', () => showCard(currentCard - 1));
+            nextBtn?.addEventListener('click', () => showCard(currentCard + 1));
+
+            dots.forEach((dot, idx) => {
+                dot.addEventListener('click', () => showCard(idx));
+            });
+
+            if (track) {
+                let startX = 0;
+                track.addEventListener('touchstart', (e) => {
+                    startX = e.changedTouches[0].screenX;
+                }, { passive: true });
+
+                track.addEventListener('touchend', (e) => {
+                    if (window.innerWidth >= 768) return;
+                    const deltaX = e.changedTouches[0].screenX - startX;
+                    if (Math.abs(deltaX) > 40) {
+                        if (deltaX < 0) {
+                            showCard(currentCard + 1);
+                        } else {
+                            showCard(currentCard - 1);
+                        }
+                    }
+                }, { passive: true });
+            }
+        });
+    });
+</script>

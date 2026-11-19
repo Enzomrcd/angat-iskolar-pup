@@ -1,0 +1,275 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Hero from '../../components/Hero.astro';
+import { getCollection } from 'astro:content';
+
+const allPrograms = await getCollection('programs');
+
+const sortedPrograms = allPrograms.sort((a, b) => {
+    if (!a.data.date || !b.data.date) return 0;
+    return new Date(b.data.date).getTime() - new Date(a.data.date).getTime();
+});
+
+const committeeOptions = [
+    { value: "ALL", label: "All Committees" },
+    { value: "Committee on Education", label: "Education" },
+    { value: "Committee on Environmental & Agricultural Development", label: "Environmental & Agricultural Development" },
+    { value: "Committee on Gender Equality & Social Harmony", label: "Gender Equality & Social Harmony" },
+    { value: "Committee on Good Governance", label: "Good Governance" },
+    { value: "Committee on Health", label: "Health" }
+];
+---
+
+<BaseLayout title="Programs & Impact | Angat Iskolar PUP">
+    <Hero title="PROGRAMS & IMPACT" />
+
+    <div class="max-w-7xl mx-auto px-6 py-16 flex flex-col items-center bg-transparent">
+        
+        {/* Primary Category Toggle */}
+        <div class="flex flex-wrap justify-center gap-4 mb-8">
+            <button 
+                type="button"
+                data-type-filter="Flagship Program"
+                class="type-tab-btn px-8 py-3 rounded-full font-bold text-sm md:text-base tracking-wide transition-all duration-300 shadow-md bg-aip-cerise text-white cursor-pointer"
+            >
+                Flagship Programs
+            </button>
+            <button 
+                type="button"
+                data-type-filter="Committee Initiative"
+                class="type-tab-btn px-8 py-3 rounded-full font-bold text-sm md:text-base tracking-wide transition-all duration-300 shadow-md bg-white text-gray-700 hover:bg-gray-50 border border-gray-100 cursor-pointer"
+            >
+                Committee Initiatives
+            </button>
+        </div>
+
+        {/* Secondary Committee Slider Selector (Shown only when Committee Initiatives is active) */}
+        <div 
+            id="committee-subfilters" 
+            data-committees={JSON.stringify(committeeOptions)}
+            class="hidden items-center justify-between w-full max-w-xl bg-white border border-gray-200 rounded-full p-1.5 shadow-md mb-12 animate-fade-in-up"
+        >
+            <button 
+                type="button"
+                id="committee-prev-btn"
+                aria-label="Previous committee"
+                class="w-10 h-10 flex-shrink-0 rounded-full bg-gray-100 text-gray-700 hover:bg-aip-plum hover:text-white flex items-center justify-center transition-all duration-200 active:scale-95 touch-manipulation cursor-pointer"
+            >
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7" />
+                </svg>
+            </button>
+
+            <div class="flex flex-col items-center justify-center px-3 text-center overflow-hidden">
+                <span id="committee-active-label" class="text-xs sm:text-sm font-bold uppercase tracking-wider text-aip-plum leading-snug">
+                    All Committees
+                </span>
+                <div class="flex items-center gap-1.5 mt-1">
+                    {committeeOptions.map((_, idx) => (
+                        <button
+                            type="button"
+                            data-committee-dot={idx}
+                            aria-label={`Select committee ${idx + 1}`}
+                            class={`h-1.5 rounded-full transition-all duration-300 cursor-pointer ${
+                                idx === 0
+                                    ? 'w-5 bg-aip-cerise'
+                                    : 'w-1.5 bg-gray-300 hover:bg-gray-400'
+                            }`}
+                        />
+                    ))}
+                </div>
+            </div>
+
+            <button 
+                type="button"
+                id="committee-next-btn"
+                aria-label="Next committee"
+                class="w-10 h-10 flex-shrink-0 rounded-full bg-gray-100 text-gray-700 hover:bg-aip-plum hover:text-white flex items-center justify-center transition-all duration-200 active:scale-95 touch-manipulation cursor-pointer"
+            >
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7" />
+                </svg>
+            </button>
+        </div>
+
+        {/* Programs Grid */}
+        {sortedPrograms.length === 0 ? (
+            <div class="text-gray-700 text-center border-2 border-dashed border-gray-300 rounded-2xl p-12 w-full max-w-4xl">
+                <p class="text-xl font-bold">[Content Pending from CMS]</p>
+                <p class="mt-2 text-gray-500">Program details and impact reports will be dynamically generated here.</p>
+            </div>
+        ) : (
+            <div id="programs-grid" class="w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                {sortedPrograms.map((program, index) => {
+                    const isFlagship = (program.data.program_type || "Flagship Program") === "Flagship Program";
+                    return (
+                        <a 
+                            href={`/programs-impact/${program.id}`} 
+                            data-program-type={program.data.program_type || "Flagship Program"}
+                            data-committee={program.data.committee || ""}
+                            class={`program-card animate-fade-in-up delay-${(index % 3) * 100} flex flex-col bg-white rounded-3xl shadow-lg border border-gray-100 overflow-hidden hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 hover:scale-[1.02] cursor-pointer touch-manipulation group`}
+                        >
+                            {program.data.image ? (
+                                <img src={program.data.image} alt={program.data.title} class="w-full h-48 object-cover border-b-4 border-aip-cerise" />
+                            ) : (
+                                <div class="w-full h-48 bg-gray-100 flex items-center justify-center border-b-4 border-gray-200">
+                                    <svg class="w-12 h-12 text-gray-400" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"></path>
+                                    </svg>
+                                </div>
+                            )}
+                            
+                            <div class="p-6 flex flex-col flex-grow">
+                                <div class="flex flex-wrap gap-2 mb-3">
+                                    <span class="inline-block bg-aip-plum/10 text-aip-plum text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">
+                                        {program.data.category}
+                                    </span>
+                                    {program.data.committee && (
+                                        <span class="inline-block bg-aip-cerise/10 text-aip-cerise text-xs font-bold px-3 py-1 rounded-full">
+                                            {program.data.committee.replace('Committee on ', '')}
+                                        </span>
+                                    )}
+                                </div>
+                                
+                                <h3 class="text-2xl font-bold text-gray-900 mb-3 group-hover:text-aip-cerise transition-colors">{program.data.title}</h3>
+                                
+                                {!isFlagship && program.data.date && (
+                                    <p class="text-sm text-gray-500 mb-4 font-semibold">
+                                        {new Date(program.data.date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
+                                    </p>
+                                )}
+                                
+                                {(program.data.excerpt || program.body) && (
+                                    <p class="text-sm text-gray-600 leading-relaxed line-clamp-4 mt-auto">
+                                        {program.data.excerpt || program.body}
+                                    </p>
+                                )}
+
+                                {isFlagship && (
+                                    <div class="mt-5 pt-4 border-t border-gray-100 flex items-center justify-between text-xs font-bold text-aip-cerise uppercase tracking-wider">
+                                        <span>Explore Annual Editions</span>
+                                        <svg class="w-4 h-4 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                                        </svg>
+                                    </div>
+                                )}
+                            </div>
+                        </a>
+                    );
+                })}
+            </div>
+        )}
+
+        {/* Empty Filter State */}
+        <div id="empty-filter-state" class="hidden text-gray-700 text-center border-2 border-dashed border-gray-300 rounded-2xl p-12 w-full max-w-4xl mt-4">
+            <p class="text-xl font-bold text-gray-800">No initiatives posted under this filter yet.</p>
+            <p class="mt-2 text-gray-500">Upcoming programs and committee projects will appear here once published.</p>
+        </div>
+    </div>
+</BaseLayout>
+
+<script>
+    document.addEventListener('astro:page-load', () => {
+        const typeButtons = document.querySelectorAll('.type-tab-btn');
+        const subfilterBar = document.getElementById('committee-subfilters');
+        const prevBtn = document.getElementById('committee-prev-btn');
+        const nextBtn = document.getElementById('committee-next-btn');
+        const activeLabel = document.getElementById('committee-active-label');
+        const dots = document.querySelectorAll('[data-committee-dot]');
+        const cards = document.querySelectorAll('.program-card');
+        const emptyState = document.getElementById('empty-filter-state');
+
+        const committeeOptions: { value: string; label: string }[] = subfilterBar?.dataset.committees
+            ? JSON.parse(subfilterBar.dataset.committees)
+            : [{ value: 'ALL', label: 'All Committees' }];
+
+        let activeType = 'Flagship Program';
+        let committeeIndex = 0;
+
+        const filterCards = () => {
+            const activeCommittee = committeeOptions[committeeIndex]?.value || 'ALL';
+            let visibleCount = 0;
+
+            cards.forEach((card) => {
+                const el = card as HTMLElement;
+                const cardType = el.dataset.programType || 'Flagship Program';
+                const cardCommittee = el.dataset.committee || '';
+
+                const matchesType = cardType === activeType;
+                const matchesCommittee = activeType !== 'Committee Initiative' || activeCommittee === 'ALL' || cardCommittee === activeCommittee;
+
+                if (matchesType && matchesCommittee) {
+                    el.classList.remove('hidden');
+                    el.classList.add('flex');
+                    visibleCount++;
+                } else {
+                    el.classList.add('hidden');
+                    el.classList.remove('flex');
+                }
+            });
+
+            if (emptyState && cards.length > 0) {
+                if (visibleCount === 0) {
+                    emptyState.classList.remove('hidden');
+                } else {
+                    emptyState.classList.add('hidden');
+                }
+            }
+        };
+
+        const setCommitteeIndex = (newIndex: number) => {
+            const total = committeeOptions.length;
+            committeeIndex = ((newIndex % total) + total) % total;
+
+            if (activeLabel) {
+                activeLabel.textContent = committeeOptions[committeeIndex].label;
+            }
+
+            dots.forEach((dot, idx) => {
+                if (idx === committeeIndex) {
+                    dot.classList.remove('w-1.5', 'bg-gray-300', 'hover:bg-gray-400');
+                    dot.classList.add('w-5', 'bg-aip-cerise');
+                } else {
+                    dot.classList.remove('w-5', 'bg-aip-cerise');
+                    dot.classList.add('w-1.5', 'bg-gray-300', 'hover:bg-gray-400');
+                }
+            });
+
+            filterCards();
+        };
+
+        typeButtons.forEach((btn) => {
+            btn.addEventListener('click', () => {
+                activeType = (btn as HTMLElement).dataset.typeFilter || 'Flagship Program';
+
+                typeButtons.forEach((b) => {
+                    b.classList.remove('bg-aip-cerise', 'text-white');
+                    b.classList.add('bg-white', 'text-gray-700', 'hover:bg-gray-50', 'border', 'border-gray-100');
+                });
+                btn.classList.remove('bg-white', 'text-gray-700', 'hover:bg-gray-50', 'border', 'border-gray-100');
+                btn.classList.add('bg-aip-cerise', 'text-white');
+
+                if (subfilterBar) {
+                    if (activeType === 'Committee Initiative') {
+                        subfilterBar.classList.remove('hidden');
+                        subfilterBar.classList.add('flex');
+                    } else {
+                        subfilterBar.classList.add('hidden');
+                        subfilterBar.classList.remove('flex');
+                    }
+                }
+
+                filterCards();
+            });
+        });
+
+        prevBtn?.addEventListener('click', () => setCommitteeIndex(committeeIndex - 1));
+        nextBtn?.addEventListener('click', () => setCommitteeIndex(committeeIndex + 1));
+
+        dots.forEach((dot, idx) => {
+            dot.addEventListener('click', () => setCommitteeIndex(idx));
+        });
+
+        filterCards();
+    });
+</script>

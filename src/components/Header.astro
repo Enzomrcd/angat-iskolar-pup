@@ -13,30 +13,41 @@ const navLinks = [
 ];
 ---
 
-<header class="absolute top-0 left-0 w-full z-50 px-4 md:px-8 py-6 flex items-center justify-between text-white">
+<header class="absolute top-0 left-0 w-full z-50 px-4 md:px-8 py-5 flex items-center justify-between text-white">
   <!-- Left side: Logo & Desktop Search -->
   <div class="flex items-center gap-4 xl:gap-6">
-    <!-- Ensure Logo stays above mobile overlay -->
-    <a href="/" aria-label="Home" class="flex-shrink-0 relative z-50">
+    <a href="/" aria-label="Home" class="flex-shrink-0 relative z-[70] min-h-[44px] flex items-center">
       <img src="/images/logos/main_logo.png" alt="Angat Iskolar PUP Logo" class="h-10 md:h-12 w-auto" />
     </a>
     
-    <!-- Desktop Search (Hidden on Mobile) -->
-    <div class="relative hidden md:block">
-      <span class="absolute inset-y-0 left-0 flex items-center pl-3">
+    <!-- Desktop Search -->
+    <div class="relative hidden md:block" data-search-wrapper>
+      <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 pointer-events-none">
         <svg class="w-4 h-4 md:w-5 md:h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
         </svg>
       </span>
       <input 
-        type="text" 
-        placeholder="Search" 
-        class="pl-10 pr-4 py-1.5 md:py-2 rounded-full bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-aip-cerise w-48 lg:w-64 shadow-md text-sm"
+        type="search"
+        data-search-input
+        autocomplete="off"
+        placeholder="Search programs, people..." 
+        aria-label="Search site"
+        class="pl-10 pr-8 py-1.5 md:py-2 rounded-full bg-white text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-aip-cerise w-52 lg:w-64 shadow-md text-sm"
       />
+      <kbd class="hidden lg:inline-flex items-center justify-center absolute right-3 top-1/2 -translate-y-1/2 text-[10px] font-bold text-gray-400 bg-gray-100 px-1.5 py-0.5 rounded border border-gray-200 pointer-events-none">
+        /
+      </kbd>
+
+      <!-- Desktop Search Results Dropdown -->
+      <div
+        data-search-results
+        class="hidden absolute left-0 mt-2.5 w-80 lg:w-96 max-h-[26rem] overflow-y-auto bg-white text-gray-900 rounded-2xl shadow-2xl border border-gray-100 divide-y divide-gray-100 z-[70]"
+      ></div>
     </div>
   </div>
 
-  <!-- Right side: Desktop Navigation Links (Hidden on Mobile) -->
+  <!-- Right side: Desktop Navigation Links -->
   <nav class="hidden xl:flex items-center">
     <ul class="flex items-center space-x-1">
       {navLinks.map((link) => {
@@ -61,36 +72,53 @@ const navLinks = [
     </ul>
   </nav>
 
-  <!-- Mobile Menu Toggle Button (Visible only on Mobile) -->
-  <button id="mobile-menu-btn" class="xl:hidden relative z-50 p-2 text-white focus:outline-none" aria-label="Toggle Menu">
-    <!-- Hamburger Icon -->
-    <svg id="icon-menu" class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+  <!-- Mobile Menu Toggle Button (48x48px accessible hit target) -->
+  <button
+    type="button"
+    id="mobile-menu-btn"
+    aria-expanded="false"
+    aria-controls="mobile-menu"
+    aria-label="Toggle Menu"
+    class="xl:hidden relative z-[70] min-w-[48px] min-h-[48px] flex items-center justify-center rounded-full text-white active:bg-white/20 focus:outline-none touch-manipulation"
+  >
+    <svg id="icon-menu" class="w-8 h-8 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
     </svg>
-    <!-- Close (X) Icon (Hidden by default) -->
-    <svg id="icon-close" class="w-8 h-8 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+    <svg id="icon-close" class="w-8 h-8 hidden pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
     </svg>
   </button>
 
   <!-- Mobile Menu Overlay -->
-  <div id="mobile-menu" class="fixed inset-0 bg-aip-plum bg-opacity-95 z-40 hidden flex-col items-center justify-center pt-20 pb-8 overflow-y-auto">
+  <div
+    id="mobile-menu"
+    class="fixed inset-0 bg-aip-plum z-[60] hidden flex-col items-center justify-start overflow-y-auto pt-24 pb-12 px-6 touch-manipulation"
+  >
     <!-- Mobile Search -->
-    <div class="relative w-3/4 max-w-sm mb-8">
-      <span class="absolute inset-y-0 left-0 flex items-center pl-3">
+    <div class="relative w-full max-w-sm mb-6 z-[70]" data-search-wrapper>
+      <span class="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none">
         <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
         </svg>
       </span>
       <input 
-        type="text" 
-        placeholder="Search" 
-        class="w-full pl-10 pr-4 py-3 rounded-full bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-aip-cerise shadow-md text-base"
+        type="search"
+        data-search-input
+        autocomplete="off"
+        placeholder="Search programs, people..." 
+        aria-label="Search site"
+        class="w-full min-h-[48px] pl-11 pr-4 py-3 rounded-full bg-white text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-aip-cerise shadow-md text-base"
       />
+
+      <!-- Mobile Search Results Dropdown -->
+      <div
+        data-search-results
+        class="hidden mt-2 w-full max-h-72 overflow-y-auto bg-white text-gray-900 rounded-2xl shadow-2xl border border-gray-100 divide-y divide-gray-100"
+      ></div>
     </div>
 
     <!-- Mobile Navigation Links -->
-    <nav class="flex flex-col items-center space-y-4 w-full px-6">
+    <nav class="flex flex-col items-center space-y-2.5 w-full max-w-sm relative z-[70]">
       {navLinks.map((link) => {
         const normalizedPath = currentPath.replace(/\/$/, '') || '/';
         const isActive = normalizedPath === link.url;
@@ -98,10 +126,10 @@ const navLinks = [
         return (
           <a 
             href={link.url} 
-            class={`w-full text-center px-6 py-3 rounded-full text-base font-bold tracking-wide transition-colors ${
+            class={`mobile-nav-item flex items-center justify-center w-full min-h-[48px] px-6 py-3 rounded-full text-base font-bold tracking-wide transition-colors touch-manipulation ${
               isActive 
                 ? 'bg-aip-cerise text-white shadow-md' 
-                : 'text-white hover:bg-white/10'
+                : 'text-white hover:bg-white/20 active:bg-white/30'
             }`}
           >
             {link.name}
@@ -112,26 +140,249 @@ const navLinks = [
   </div>
 </header>
 
-<!-- Script to handle mobile menu toggling -->
 <script>
-  const btn = document.getElementById('mobile-menu-btn');
-  const menu = document.getElementById('mobile-menu');
-  const iconMenu = document.getElementById('icon-menu');
-  const iconClose = document.getElementById('icon-close');
-  const body = document.body;
+  interface SearchItem {
+    title: string;
+    subtitle: string;
+    category: 'Program' | 'Annual Edition' | 'People' | 'Archive' | 'Page';
+    url: string;
+    keywords: string;
+  }
 
-  if (btn && menu && iconMenu && iconClose) {
-    btn.addEventListener('click', () => {
-      // Toggle menu visibility
-      menu.classList.toggle('hidden');
-      menu.classList.toggle('flex');
-      
-      // Toggle icons
-      iconMenu.classList.toggle('hidden');
-      iconClose.classList.toggle('hidden');
-      
-      // Prevent body scrolling when menu is open
-      body.classList.toggle('overflow-hidden');
+  let cachedSearchIndex: SearchItem[] | null = null;
+  let fetchPromise: Promise<SearchItem[]> | null = null;
+  let globalListenersBound = false;
+
+  const getSearchIndex = async (): Promise<SearchItem[]> => {
+    if (cachedSearchIndex) return cachedSearchIndex;
+    if (!fetchPromise) {
+      fetchPromise = fetch('/search-index.json')
+        .then((res) => (res.ok ? res.json() : []))
+        .then((data: SearchItem[]) => {
+          cachedSearchIndex = data;
+          return data;
+        })
+        .catch(() => []);
+    }
+    return fetchPromise;
+  };
+
+  const escapeHTML = (str: string) =>
+    str.replace(/[&<>"']/g, (ch) =>
+      ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch] || ch)
+    );
+
+  const badgeStyleForCategory = (category: SearchItem['category']) => {
+    switch (category) {
+      case 'Program':
+        return 'bg-aip-cerise/10 text-aip-cerise';
+      case 'Annual Edition':
+        return 'bg-aip-plum/10 text-aip-plum';
+      case 'People':
+        return 'bg-amber-100 text-amber-800';
+      case 'Archive':
+        return 'bg-sky-100 text-sky-800';
+      default:
+        return 'bg-gray-100 text-gray-700';
+    }
+  };
+
+  // Bind global listeners once to prevent listener stacking across Astro ClientRouter transitions
+  if (!globalListenersBound) {
+    globalListenersBound = true;
+
+    document.addEventListener('click', (e) => {
+      document.querySelectorAll('[data-search-wrapper]').forEach((wrapper) => {
+        if (!wrapper.contains(e.target as Node)) {
+          wrapper.querySelector('[data-search-results]')?.classList.add('hidden');
+        }
+      });
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (
+        e.key === '/' &&
+        document.activeElement?.tagName !== 'INPUT' &&
+        document.activeElement?.tagName !== 'TEXTAREA'
+      ) {
+        const desktopInput = document.querySelector('header .hidden.md\\:block [data-search-input]') as HTMLInputElement | null;
+        if (desktopInput) {
+          e.preventDefault();
+          desktopInput.focus();
+        }
+      }
     });
   }
+
+  document.addEventListener('astro:page-load', () => {
+    const btn = document.getElementById('mobile-menu-btn');
+    const menu = document.getElementById('mobile-menu');
+    const iconMenu = document.getElementById('icon-menu');
+    const iconClose = document.getElementById('icon-close');
+    const body = document.body;
+    const mobileNavItems = document.querySelectorAll('.mobile-nav-item');
+
+    const closeMenu = () => {
+      if (menu && iconMenu && iconClose && btn) {
+        menu.classList.add('hidden');
+        menu.classList.remove('flex');
+        iconMenu.classList.remove('hidden');
+        iconClose.classList.add('hidden');
+        btn.setAttribute('aria-expanded', 'false');
+        body.classList.remove('overflow-hidden');
+      }
+    };
+
+    closeMenu();
+
+    if (btn && menu && iconMenu && iconClose) {
+      btn.onclick = (e) => {
+        e.stopPropagation();
+        const isHidden = menu.classList.contains('hidden');
+        if (isHidden) {
+          menu.classList.remove('hidden');
+          menu.classList.add('flex');
+          iconMenu.classList.add('hidden');
+          iconClose.classList.remove('hidden');
+          btn.setAttribute('aria-expanded', 'true');
+          body.classList.add('overflow-hidden');
+        } else {
+          closeMenu();
+        }
+      };
+    }
+
+    mobileNavItems.forEach((item) => {
+      item.addEventListener('click', closeMenu);
+    });
+
+    const wrappers = document.querySelectorAll('[data-search-wrapper]');
+
+    wrappers.forEach((wrapper) => {
+      const input = wrapper.querySelector('[data-search-input]') as HTMLInputElement | null;
+      const resultsBox = wrapper.querySelector('[data-search-results]') as HTMLElement | null;
+      if (!input || !resultsBox) return;
+
+      let activeResultIdx = -1;
+
+      const hideResults = () => {
+        resultsBox.classList.add('hidden');
+        activeResultIdx = -1;
+      };
+
+      const renderResults = (matches: SearchItem[], query: string) => {
+        activeResultIdx = -1;
+
+        if (!query) {
+          hideResults();
+          return;
+        }
+
+        if (matches.length === 0) {
+          resultsBox.innerHTML = `
+            <div class="p-5 text-center">
+              <p class="text-sm font-bold text-gray-700">No results found for "${escapeHTML(query)}"</p>
+              <p class="text-xs text-gray-400 mt-1">Try searching a program, committee, year, or officer name.</p>
+            </div>
+          `;
+          resultsBox.classList.remove('hidden');
+          return;
+        }
+
+        resultsBox.innerHTML = matches
+          .slice(0, 8)
+          .map(
+            (item) => `
+              <a
+                href="${escapeHTML(item.url)}"
+                data-search-result-item
+                class="flex flex-col gap-1 px-4 py-3.5 min-h-[48px] hover:bg-gray-50 active:bg-gray-100 focus:bg-gray-50 focus:outline-none transition-colors"
+              >
+                <div class="flex items-center justify-between gap-2">
+                  <span class="text-sm font-bold text-gray-900 truncate">${escapeHTML(item.title)}</span>
+                  <span class="flex-shrink-0 text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full ${badgeStyleForCategory(item.category)}">
+                    ${escapeHTML(item.category)}
+                  </span>
+                </div>
+                <span class="text-xs text-gray-500 truncate">${escapeHTML(item.subtitle)}</span>
+              </a>
+            `
+          )
+          .join('');
+
+        resultsBox.classList.remove('hidden');
+
+        resultsBox.querySelectorAll('[data-search-result-item]').forEach((link) => {
+          link.addEventListener('click', () => {
+            closeMenu();
+            hideResults();
+          });
+        });
+      };
+
+      const runSearch = async () => {
+        const rawQuery = input.value.trim();
+        if (!rawQuery) {
+          hideResults();
+          return;
+        }
+
+        const tokens = rawQuery.toLowerCase().split(/\s+/);
+        const index = await getSearchIndex();
+
+        const scored = index
+          .map((item) => {
+            const titleLower = item.title.toLowerCase();
+            const subtitleLower = item.subtitle.toLowerCase();
+            const haystack = `${titleLower} ${subtitleLower} ${item.keywords}`;
+
+            const allMatch = tokens.every((token) => haystack.includes(token));
+            if (!allMatch) return null;
+
+            let score = 1;
+            if (titleLower.startsWith(tokens[0])) score += 5;
+            if (titleLower.includes(rawQuery.toLowerCase())) score += 4;
+            if (subtitleLower.includes(rawQuery.toLowerCase())) score += 2;
+
+            return { item, score };
+          })
+          .filter((entry): entry is { item: SearchItem; score: number } => entry !== null)
+          .sort((a, b) => b.score - a.score)
+          .map((entry) => entry.item);
+
+        renderResults(scored, rawQuery);
+      };
+
+      input.addEventListener('focus', () => {
+        getSearchIndex();
+        if (input.value.trim()) runSearch();
+      });
+
+      input.addEventListener('input', runSearch);
+
+      input.addEventListener('keydown', (e) => {
+        const items = resultsBox.querySelectorAll('[data-search-result-item]') as NodeListOf<HTMLAnchorElement>;
+        if (items.length === 0) {
+          if (e.key === 'Escape') hideResults();
+          return;
+        }
+
+        if (e.key === 'ArrowDown') {
+          e.preventDefault();
+          activeResultIdx = (activeResultIdx + 1) % items.length;
+          items.forEach((el, i) => el.classList.toggle('bg-gray-100', i === activeResultIdx));
+        } else if (e.key === 'ArrowUp') {
+          e.preventDefault();
+          activeResultIdx = (activeResultIdx - 1 + items.length) % items.length;
+          items.forEach((el, i) => el.classList.toggle('bg-gray-100', i === activeResultIdx));
+        } else if (e.key === 'Enter' && activeResultIdx >= 0) {
+          e.preventDefault();
+          items[activeResultIdx].click();
+        } else if (e.key === 'Escape') {
+          hideResults();
+          input.blur();
+        }
+      });
+    });
+  });
 </script>

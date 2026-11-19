@@ -1,0 +1,322 @@
+---
+// src/components/SeasonalAtmosphere.astro
+---
+
+<!-- Full-Viewport Non-Blocking Ambient Layer -->
+<div
+  id="aip-seasonal-stage"
+  aria-hidden="true"
+  style="position: fixed; inset: 0; pointer-events: none; z-index: 30; overflow: hidden;"
+  class="select-none"
+>
+  <!-- Dynamic SVG Cultural Corner Motif (Top-Right Hero Accent) -->
+  <div id="aip-seasonal-motif" class="absolute top-20 right-4 sm:right-10 md:right-16 opacity-90 transition-opacity duration-500"></div>
+
+  <!-- Dynamic Ambient Particles Container -->
+  <div id="aip-seasonal-particles" class="absolute inset-0"></div>
+</div>
+
+<!-- Dismissible Cultural Greeting Toast (Strictly Viewport-Locked) -->
+<div
+  id="aip-seasonal-greeting"
+  style="position: fixed; z-index: 9990; transform: none;"
+  class="hidden bottom-20 sm:bottom-5 left-4 right-4 sm:right-auto sm:left-5 sm:max-w-md bg-white border border-gray-200 shadow-2xl rounded-2xl px-4 py-3 flex items-start gap-3"
+>
+  <span id="aip-greeting-icon" class="text-xl flex-shrink-0 mt-0.5">✨</span>
+  <div class="min-w-0 flex-1">
+    <p id="aip-greeting-title" class="text-xs font-bold uppercase tracking-wider text-aip-cerise leading-tight"></p>
+    <p id="aip-greeting-text" class="text-xs sm:text-sm text-gray-700 leading-snug mt-1"></p>
+  </div>
+  <button
+    type="button"
+    id="aip-greeting-dismiss"
+    aria-label="Dismiss seasonal greeting"
+    class="text-gray-400 hover:text-gray-700 text-xs font-bold p-1 -mr-1 -mt-0.5 flex-shrink-0 cursor-pointer touch-manipulation"
+  >
+    ✕
+  </button>
+</div>
+
+<script>
+  interface ThemeAtmosphereConfig {
+    greetingTitle: string;
+    greetingText: string;
+    greetingIcon: string;
+    motifSVG: string;
+    particles: {
+      direction: 'fall' | 'rise';
+      count: number;
+      shapes: string[];
+    };
+  }
+
+  const ATMOSPHERES: Record<string, ThemeAtmosphereConfig> = {
+    pasko: {
+      greetingTitle: 'Maligayang Pasko!',
+      greetingText: 'Isang mapagpalang Paskong Pinoy, mga Iskolar!',
+      greetingIcon: '🎄',
+      motifSVG: `
+        <svg class="w-28 h-28 sm:w-36 sm:h-36 md:w-44 md:h-44 aip-motif-twinkle drop-shadow-[0_0_24px_rgba(250,204,21,0.45)]" viewBox="0 0 200 200" fill="none">
+          <circle cx="100" cy="100" r="78" stroke="rgba(254,240,138,0.35)" stroke-width="2" stroke-dasharray="6 6"/>
+          <circle cx="100" cy="100" r="62" stroke="rgba(255,255,255,0.3)" stroke-width="1.5"/>
+          <polygon points="100,14 122,74 186,74 134,112 154,174 100,136 46,174 66,112 14,74 78,74" fill="rgba(250,204,21,0.22)" stroke="#fef08a" stroke-width="2.5"/>
+          <polygon points="100,34 114,78 160,78 123,105 137,149 100,122 63,149 77,105 40,78 86,78" fill="rgba(220,38,38,0.35)" stroke="#ffffff" stroke-width="1.5"/>
+          <circle cx="100" cy="96" r="14" fill="#fef08a" fill-opacity="0.75"/>
+          <path d="M72 162 L62 194 L76 184 L86 194 Z" fill="rgba(250,204,21,0.45)"/>
+          <path d="M128 162 L114 194 L124 184 L138 194 Z" fill="rgba(250,204,21,0.45)"/>
+        </svg>
+      `,
+      particles: {
+        direction: 'fall',
+        count: 16,
+        shapes: [
+          '<span class="block w-2 h-2 rounded-full bg-white/75 shadow-[0_0_8px_#fff]"></span>',
+          '<span class="block text-yellow-200/80 text-xs">✦</span>',
+          '<span class="block w-1.5 h-1.5 rounded-full bg-yellow-300/80"></span>',
+        ],
+      },
+    },
+
+    undas: {
+      greetingTitle: 'Paggunita sa Undas',
+      greetingText: 'Liwanag at panalangin para sa ating mga mahal sa buhay.',
+      greetingIcon: '🕯️',
+      motifSVG: `
+        <svg class="w-24 h-24 sm:w-32 sm:h-32 md:w-36 md:h-36 drop-shadow-[0_0_25px_rgba(251,146,60,0.5)]" viewBox="0 0 160 180" fill="none">
+          <ellipse cx="80" cy="52" rx="34" ry="42" fill="rgba(251,191,36,0.16)"/>
+          <path class="aip-candle-flicker" d="M80 22 C92 42, 95 56, 80 66 C65 56, 68 42, 80 22 Z" fill="#fbbf24"/>
+          <path class="aip-candle-flicker" d="M80 34 C86 46, 88 54, 80 61 C72 54, 74 46, 80 34 Z" fill="#fef9c3"/>
+          <rect x="64" y="68" width="32" height="84" rx="8" fill="rgba(255,255,255,0.22)" stroke="rgba(254,243,199,0.5)" stroke-width="1.5"/>
+          <ellipse cx="80" cy="154" rx="30" ry="7" fill="rgba(251,191,36,0.35)"/>
+        </svg>
+      `,
+      particles: {
+        direction: 'rise',
+        count: 14,
+        shapes: [
+          '<span class="block w-2 h-2 rounded-full bg-amber-400/75 shadow-[0_0_10px_#f59e0b]"></span>',
+          '<span class="block w-1.5 h-1.5 rounded-full bg-orange-300/80"></span>',
+        ],
+      },
+    },
+
+    kalayaan: {
+      greetingTitle: 'Maligayang Araw ng Kalayaan!',
+      greetingText: 'Mabuhay ang kalayaan at kabataang Pilipino!',
+      greetingIcon: '🇵🇭',
+      motifSVG: `
+        <svg class="w-28 h-28 sm:w-36 sm:h-36 md:w-44 md:h-44 aip-motif-twinkle drop-shadow-[0_0_20px_rgba(250,204,21,0.4)]" viewBox="0 0 200 200" fill="none">
+          <circle cx="100" cy="100" r="24" fill="rgba(252,209,22,0.45)" stroke="#fde047" stroke-width="2"/>
+          <g stroke="#fde047" stroke-width="3" stroke-linecap="round">
+            <line x1="100" y1="36" x2="100" y2="64"/>
+            <line x1="100" y1="136" x2="100" y2="164"/>
+            <line x1="36" y1="100" x2="64" y2="100"/>
+            <line x1="136" y1="100" x2="164" y2="100"/>
+            <line x1="55" y1="55" x2="75" y2="75"/>
+            <line x1="125" y1="125" x2="145" y2="145"/>
+            <line x1="145" y1="55" x2="125" y2="75"/>
+            <line x1="75" y1="125" x2="55" y2="145"/>
+          </g>
+          <polygon points="100,10 103,18 112,18 105,23 107,31 100,26 93,31 95,23 88,18 97,18" fill="#fde047"/>
+          <polygon points="26,158 29,166 38,166 31,171 33,179 26,174 19,179 21,171 14,166 23,166" fill="#fde047"/>
+          <polygon points="174,158 177,166 186,166 179,171 181,179 174,174 167,179 169,171 162,166 171,166" fill="#fde047"/>
+        </svg>
+      `,
+      particles: {
+        direction: 'fall',
+        count: 14,
+        shapes: [
+          '<span class="block w-2.5 h-1.5 rounded-sm bg-blue-500/70"></span>',
+          '<span class="block w-2.5 h-1.5 rounded-sm bg-red-500/70"></span>',
+          '<span class="block w-2 h-2 rounded-full bg-yellow-300/85"></span>',
+        ],
+      },
+    },
+
+    'buwan-ng-wika': {
+      greetingTitle: 'Maligayang Buwan ng Wika!',
+      greetingText: 'Wikang Filipino: Wikang Mapagpalaya at Makabayan.',
+      greetingIcon: '🌾',
+      motifSVG: `
+        <svg class="w-28 h-28 sm:w-36 sm:h-36 md:w-40 md:h-40 aip-motif-twinkle" viewBox="0 0 180 180" fill="none">
+          <rect x="90" y="18" width="102" height="102" transform="rotate(45 90 18)" stroke="rgba(254,240,138,0.45)" stroke-width="2" fill="rgba(217,119,6,0.12)"/>
+          <rect x="90" y="38" width="74" height="74" transform="rotate(45 90 38)" stroke="rgba(255,255,255,0.35)" stroke-width="1.5"/>
+          <circle cx="90" cy="90" r="16" fill="rgba(253,224,71,0.35)" stroke="#fef08a" stroke-width="1.5"/>
+        </svg>
+      `,
+      particles: {
+        direction: 'fall',
+        count: 12,
+        shapes: [
+          '<span class="block w-3 h-1.5 rounded-full bg-amber-300/75 rotate-45"></span>',
+          '<span class="block w-2.5 h-1.5 rounded-full bg-orange-400/70 -rotate-12"></span>',
+        ],
+      },
+    },
+
+    pride: {
+      greetingTitle: 'Happy Pride Month!',
+      greetingText: 'Pantay-pantay na karapatan at pagmamahal para sa lahat.',
+      greetingIcon: '🏳️‍🌈',
+      motifSVG: `
+        <svg class="w-28 h-28 sm:w-36 sm:h-36 md:w-40 md:h-40 aip-motif-twinkle" viewBox="0 0 180 180" fill="none">
+          <circle cx="90" cy="90" r="65" stroke="rgba(255,255,255,0.3)" stroke-width="2" stroke-dasharray="10 6"/>
+          <path d="M90 132 C90 132 42 102 42 68 C42 52 55 40 70 40 C79 40 86 45 90 52 C94 45 101 40 110 40 C125 40 138 52 138 68 C138 102 90 132 90 132 Z" fill="rgba(255,255,255,0.22)" stroke="#ffffff" stroke-width="2"/>
+        </svg>
+      `,
+      particles: {
+        direction: 'rise',
+        count: 15,
+        shapes: [
+          '<span class="block w-2.5 h-2.5 rounded-full bg-pink-400/70"></span>',
+          '<span class="block w-2.5 h-2.5 rounded-full bg-amber-300/70"></span>',
+          '<span class="block w-2.5 h-2.5 rounded-full bg-teal-300/70"></span>',
+          '<span class="block w-2.5 h-2.5 rounded-full bg-violet-400/70"></span>',
+        ],
+      },
+    },
+
+    'bagong-taon': {
+      greetingTitle: 'Manigong Bagong Taon!',
+      greetingText: 'Bagong pag-asa at mas pinalakas na paglilingkod!',
+      greetingIcon: '🎆',
+      motifSVG: `
+        <svg class="w-28 h-28 sm:w-36 sm:h-36 md:w-44 md:h-44 aip-motif-twinkle drop-shadow-[0_0_24px_rgba(250,204,21,0.45)]" viewBox="0 0 200 200" fill="none">
+          <g stroke="#fde047" stroke-width="2.5" stroke-linecap="round">
+            <line x1="100" y1="20" x2="100" y2="65"/>
+            <line x1="100" y1="135" x2="100" y2="180"/>
+            <line x1="20" y1="100" x2="65" y2="100"/>
+            <line x1="135" y1="100" x2="180" y2="100"/>
+            <line x1="43" y1="43" x2="75" y2="75"/>
+            <line x1="125" y1="125" x2="157" y2="157"/>
+            <line x1="157" y1="43" x2="125" y2="75"/>
+            <line x1="75" y1="125" x2="43" y2="157"/>
+          </g>
+          <circle cx="100" cy="100" r="10" fill="#fef08a"/>
+          <circle cx="100" cy="100" r="46" stroke="rgba(255,255,255,0.35)" stroke-width="1.5" stroke-dasharray="4 8"/>
+        </svg>
+      `,
+      particles: {
+        direction: 'rise',
+        count: 16,
+        shapes: [
+          '<span class="block w-2 h-2 rounded-full bg-yellow-300/85 shadow-[0_0_10px_#fde047]"></span>',
+          '<span class="block text-amber-200/85 text-xs">✦</span>',
+        ],
+      },
+    },
+
+    anniversary: {
+      greetingTitle: 'Happy Anniversary, AIP!',
+      greetingText: "Lagi't Lagi, Para sa Bayan — Mula Oktubre 7, 2022.",
+      greetingIcon: '🎉',
+      motifSVG: `
+        <svg class="w-28 h-28 sm:w-36 sm:h-36 md:w-44 md:h-44 aip-motif-twinkle drop-shadow-[0_0_24px_rgba(251,191,36,0.45)]" viewBox="0 0 200 200" fill="none">
+          <circle cx="100" cy="100" r="70" stroke="rgba(253,224,71,0.45)" stroke-width="2" stroke-dasharray="8 5"/>
+          <polygon points="100,32 118,80 170,80 128,110 144,160 100,130 56,160 72,110 30,80 82,80" fill="rgba(253,224,71,0.22)" stroke="#fef08a" stroke-width="2"/>
+        </svg>
+      `,
+      particles: {
+        direction: 'fall',
+        count: 16,
+        shapes: [
+          '<span class="block w-2.5 h-1.5 rounded-sm bg-yellow-300/85"></span>',
+          '<span class="block w-2.5 h-1.5 rounded-sm bg-pink-300/85"></span>',
+          '<span class="block text-yellow-200 text-xs">★</span>',
+        ],
+      },
+    },
+  };
+
+  function renderSeasonalAtmosphere(isThemeSwitch = false) {
+    const activeTheme = document.documentElement.getAttribute('data-theme') || 'default';
+    const stageEl = document.getElementById('aip-seasonal-stage');
+    const motifEl = document.getElementById('aip-seasonal-motif');
+    const particlesEl = document.getElementById('aip-seasonal-particles');
+    const greetingBox = document.getElementById('aip-seasonal-greeting');
+    const greetingIcon = document.getElementById('aip-greeting-icon');
+    const greetingTitle = document.getElementById('aip-greeting-title');
+    const greetingText = document.getElementById('aip-greeting-text');
+    const dismissBtn = document.getElementById('aip-greeting-dismiss');
+
+    if (!motifEl || !particlesEl) return;
+
+    // Portal fixed elements directly onto document.body so viewport anchoring never drifts during scroll
+    if (stageEl && stageEl.parentElement !== document.body) {
+      document.body.appendChild(stageEl);
+    }
+    if (greetingBox && greetingBox.parentElement !== document.body) {
+      document.body.appendChild(greetingBox);
+    }
+
+    const config = ATMOSPHERES[activeTheme];
+
+    if (!config) {
+      motifEl.innerHTML = '';
+      particlesEl.innerHTML = '';
+      greetingBox?.classList.add('hidden');
+      return;
+    }
+
+    // 1. Inject Cultural Corner Motif SVG
+    motifEl.innerHTML = config.motifSVG;
+
+    // 2. Generate Deterministic Ambient Particles
+    const animClass = config.particles.direction === 'fall' ? 'aip-particle-fall' : 'aip-particle-rise';
+    const particleHTML: string[] = [];
+
+    for (let i = 0; i < config.particles.count; i++) {
+      const leftPct = ((i * 37 + 11) % 94) + 3;
+      const durationSec = 9 + (i % 6) * 2.2;
+      const delaySec = -(i * 1.3);
+      const shape = config.particles.shapes[i % config.particles.shapes.length];
+
+      particleHTML.push(`
+        <div
+          class="${animClass} absolute top-0"
+          style="left: ${leftPct}%; animation-duration: ${durationSec}s; animation-delay: ${delaySec}s;"
+        >
+          ${shape}
+        </div>
+      `);
+    }
+
+    particlesEl.innerHTML = particleHTML.join('');
+
+    // 3. Show Cultural Greeting Pill (reset dismiss state if user just switched themes)
+    const dismissedKey = `aip-dismissed-greeting-${activeTheme}`;
+    if (isThemeSwitch) {
+      sessionStorage.removeItem(dismissedKey);
+    }
+
+    if (greetingBox && sessionStorage.getItem(dismissedKey) !== '1') {
+      if (greetingIcon) greetingIcon.textContent = config.greetingIcon;
+      if (greetingTitle) greetingTitle.textContent = config.greetingTitle;
+      if (greetingText) greetingText.textContent = config.greetingText;
+      greetingBox.classList.remove('hidden');
+    } else {
+      greetingBox?.classList.add('hidden');
+    }
+
+    if (dismissBtn) {
+      dismissBtn.onclick = () => {
+        sessionStorage.setItem(dismissedKey, '1');
+        greetingBox?.classList.add('hidden');
+      };
+    }
+  }
+
+  document.addEventListener('astro:page-load', () => {
+    renderSeasonalAtmosphere(false);
+
+    const observer = new MutationObserver((mutations) => {
+      for (const m of mutations) {
+        if (m.attributeName === 'data-theme') {
+          renderSeasonalAtmosphere(true);
+        }
+      }
+    });
+
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+  });
+</script>

@@ -1,15 +1,346 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Hero from '../components/Hero.astro';
+import { getEntry } from 'astro:content';
+
+const globalSettings = await getEntry('settings', 'global');
+const donationMethods = globalSettings?.data?.donation_methods || [];
+const contactEmail = globalSettings?.data?.contact_email || "angatiskolarpup@gmail.com";
 ---
 
-<BaseLayout title="Archives | Angat Iskolar PUP">
-    <Hero title="ARCHIVES" />
+<BaseLayout title="Get Involved | Angat Iskolar PUP">
+    <Hero title="GET INVOLVED">
+        <p class="text-lg md:text-2xl font-light italic mt-3 opacity-95 tracking-wide">
+            Partner with us in serving communities, one Iskolar at a time
+        </p>
+    </Hero>
 
-    <div class="max-w-4xl mx-auto px-6 py-16 text-center bg-transparent">
-        <div class="border-2 border-dashed border-gray-300 rounded-2xl p-12">
-            <p class="text-xl font-bold text-gray-700">[Content Pending from CMS]</p>
-            <p class="mt-2 text-gray-500">This page is awaiting its final design and CMS data integration.</p>
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 py-14 md:py-20 bg-transparent">
+        
+        <!-- Main Support Card -->
+        <div class="bg-white rounded-[2.5rem] shadow-2xl border border-gray-100 overflow-hidden animate-fade-in-up">
+            
+            <!-- Card Header Banner -->
+            <div class="bg-gradient-to-r from-aip-cerise via-aip-raspberry to-aip-punch text-white text-center px-6 py-10 sm:py-12">
+                <h2 class="text-2xl sm:text-3xl md:text-4xl font-bold uppercase tracking-wider mb-3">
+                    Support Our Causes
+                </h2>
+                <p class="text-white/90 text-sm sm:text-base md:text-lg font-light max-w-xl mx-auto">
+                    Your contributions help us empower more communities.
+                </p>
+            </div>
+
+            <!-- Two-Column Content Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-gray-200">
+                
+                <!-- Left Column: Donation Channels -->
+                <div class="p-8 sm:p-10 md:p-12 flex flex-col">
+                    <div class="flex items-center gap-3.5 mb-8">
+                        <div class="w-11 h-11 rounded-full bg-aip-cerise/10 text-aip-cerise flex items-center justify-center flex-shrink-0">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+                            </svg>
+                        </div>
+                        <h3 class="text-lg sm:text-xl font-bold text-gray-900 uppercase tracking-wide">
+                            Donation Channels
+                        </h3>
+                    </div>
+
+                    {donationMethods.length === 0 ? (
+                        <div class="border-2 border-dashed border-gray-200 rounded-2xl p-8 text-center text-gray-500 my-auto">
+                            <p class="font-bold text-gray-700">Donation details coming soon</p>
+                            <p class="text-sm mt-1">Official bank and e-wallet channels will appear here once configured in CMS.</p>
+                        </div>
+                    ) : (
+                        <div class="space-y-5">
+                            {donationMethods.map((item) => (
+                                <div class="bg-gray-50/90 hover:bg-white rounded-3xl p-5 sm:p-6 border border-gray-100 shadow-sm hover:shadow-md transition-all duration-300 flex items-center justify-between gap-4">
+                                    <div class="min-w-0 flex-1">
+                                        <h4 class="text-base sm:text-lg font-bold text-aip-cerise uppercase tracking-wide pb-3 mb-3 border-b border-gray-200/80">
+                                            {item.method}
+                                        </h4>
+                                        
+                                        <div class="space-y-2.5">
+                                            <div>
+                                                <p class="text-[10px] sm:text-xs font-bold text-gray-400 uppercase tracking-wider">
+                                                    Account Name
+                                                </p>
+                                                <p class="text-sm sm:text-base font-bold text-gray-900 truncate">
+                                                    {item.account_name}
+                                                </p>
+                                            </div>
+                                            
+                                            <div>
+                                                <p class="text-[10px] sm:text-xs font-bold text-gray-400 uppercase tracking-wider">
+                                                    Account Number
+                                                </p>
+                                                <p class="text-sm sm:text-base font-bold text-gray-900 tracking-wide">
+                                                    {item.account_number}
+                                                </p>
+                                            </div>
+                                        </div>
+
+                                        {item.payment_link && (
+                                            <a
+                                                href={item.payment_link}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                class="inline-flex items-center gap-1.5 mt-4 text-xs font-bold text-aip-plum hover:text-aip-cerise uppercase tracking-wider transition-colors"
+                                            >
+                                                <span>Open Payment Link</span>
+                                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                                                </svg>
+                                            </a>
+                                        )}
+                                    </div>
+
+                                    {/* Clickable QR Code Thumbnail */}
+                                    {item.qr_code && (
+                                        <button
+                                            type="button"
+                                            data-qr-trigger
+                                            data-qr-src={item.qr_code}
+                                            data-qr-method={item.method}
+                                            data-qr-name={item.account_name}
+                                            data-qr-number={item.account_number}
+                                            data-qr-link={item.payment_link || ""}
+                                            aria-label={`Enlarge ${item.method} QR Code`}
+                                            class="group relative flex-shrink-0 w-24 h-24 sm:w-28 sm:h-28 bg-white rounded-2xl p-2 shadow-md border border-gray-200 hover:border-aip-cerise hover:shadow-lg transition-all duration-300 active:scale-95 touch-manipulation cursor-pointer flex flex-col items-center justify-center"
+                                        >
+                                            <img
+                                                src={item.qr_code}
+                                                alt={`${item.method} QR Code`}
+                                                class="w-full h-full object-contain rounded-lg"
+                                            />
+                                            <span class="absolute -bottom-2 bg-aip-plum text-white text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full shadow-sm opacity-95 group-hover:bg-aip-cerise transition-colors">
+                                                Tap to Zoom
+                                            </span>
+                                        </button>
+                                    )}
+                                </div>
+                            ))}
+                        </div>
+                    )}
+                </div>
+
+                <!-- Right Column: In-Kind Donations -->
+                <div class="p-8 sm:p-10 md:p-12 flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center gap-3.5 mb-8">
+                            <div class="w-11 h-11 rounded-full bg-aip-cerise/10 text-aip-cerise flex items-center justify-center flex-shrink-0">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                                </svg>
+                            </div>
+                            <h3 class="text-lg sm:text-xl font-bold text-gray-900 uppercase tracking-wide">
+                                In-Kind Donations
+                            </h3>
+                        </div>
+
+                        <p class="text-gray-600 text-base sm:text-lg leading-relaxed mb-8">
+                            For inquiries and more information regarding in-kind donations, kindly reach out to us through our official email or Facebook page.
+                        </p>
+
+                        <div class="flex flex-wrap items-center gap-3.5">
+                            <a
+                                href={`mailto:${contactEmail}?subject=In-Kind%20Donation%20Inquiry%20-%20ANGAT%20Iskolar%20PUP`}
+                                class="inline-flex items-center justify-center gap-2.5 bg-aip-plum hover:bg-[#731836] text-white font-bold px-6 py-3.5 rounded-full shadow-md hover:shadow-lg transition-all duration-300 active:scale-95 touch-manipulation text-sm sm:text-base"
+                            >
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                                </svg>
+                                <span>Email Us</span>
+                            </a>
+
+                            <a
+                                href="https://www.facebook.com/angatiskolarpup"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                class="inline-flex items-center justify-center gap-2.5 bg-[#1877F2] hover:bg-[#1464d0] text-white font-bold px-6 py-3.5 rounded-full shadow-md hover:shadow-lg transition-all duration-300 active:scale-95 touch-manipulation text-sm sm:text-base"
+                            >
+                                <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24">
+                                    <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
+                                </svg>
+                                <span>Message Us</span>
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="mt-10 pt-6 border-t border-gray-100">
+                        <p class="text-xs text-gray-400 leading-relaxed">
+                            All monetary and in-kind contributions directly support our student-led community outreach, educational drives, and disaster response initiatives.
+                        </p>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Centered Viewport Lightbox Modal (Portaled to document.body in script so it always centers on screen) -->
+    <div
+        id="qr-lightbox-modal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="qr-modal-title"
+        class="hidden fixed inset-0 z-[9999] bg-black/75 backdrop-blur-sm p-4 sm:p-6 flex items-center justify-center overflow-y-auto"
+    >
+        <div
+            id="qr-lightbox-card"
+            class="relative w-full max-w-sm bg-white rounded-3xl shadow-2xl border border-gray-100 p-6 sm:p-7 text-center my-auto animate-fade-in-up"
+        >
+            <!-- Close Button -->
+            <button
+                type="button"
+                id="qr-modal-close"
+                aria-label="Close QR preview"
+                class="absolute top-4 right-4 w-9 h-9 rounded-full bg-gray-100 text-gray-600 hover:bg-aip-cerise hover:text-white flex items-center justify-center transition-colors cursor-pointer touch-manipulation"
+            >
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+
+            <span class="inline-block bg-aip-cerise/10 text-aip-cerise text-xs font-bold px-3.5 py-1 rounded-full uppercase tracking-wider mb-2">
+                Scan to Donate
+            </span>
+            <h3 id="qr-modal-title" class="text-2xl font-bold text-gray-900 mb-4">
+                BDO
+            </h3>
+
+            <!-- Large Scannable QR Container -->
+            <div class="bg-white border-2 border-gray-100 rounded-2xl p-4 shadow-inner mx-auto max-w-[260px] aspect-square flex items-center justify-center mb-5">
+                <img
+                    id="qr-modal-img"
+                    src=""
+                    alt="Enlarged Donation QR Code"
+                    class="w-full h-full object-contain"
+                />
+            </div>
+
+            <!-- Account Info -->
+            <div class="bg-gray-50 rounded-2xl p-4 mb-5 border border-gray-100 text-left space-y-2.5">
+                <div>
+                    <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Account Name</p>
+                    <p id="qr-modal-name" class="text-sm font-bold text-gray-900"></p>
+                </div>
+                <div>
+                    <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Account Number</p>
+                    <p id="qr-modal-number" class="text-sm font-bold text-gray-900 tracking-wide"></p>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="flex flex-col gap-2.5">
+                <a
+                    id="qr-modal-download"
+                    href=""
+                    download="AIP-Donation-QR.png"
+                    class="w-full inline-flex items-center justify-center gap-2 bg-aip-plum hover:bg-[#731836] text-white font-bold py-3 px-5 rounded-full text-sm shadow-md transition-colors touch-manipulation"
+                >
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                    </svg>
+                    <span>Save QR Image</span>
+                </a>
+
+                <a
+                    id="qr-modal-link"
+                    href=""
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="hidden w-full inline-flex items-center justify-center gap-2 bg-aip-cerise hover:bg-aip-raspberry text-white font-bold py-3 px-5 rounded-full text-sm shadow-md transition-colors touch-manipulation"
+                >
+                    <span>Open Payment Portal</span>
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                    </svg>
+                </a>
+            </div>
         </div>
     </div>
 </BaseLayout>
+
+<script>
+    document.addEventListener('astro:page-load', () => {
+        const modal = document.getElementById('qr-lightbox-modal');
+        const modalCard = document.getElementById('qr-lightbox-card');
+        const closeBtn = document.getElementById('qr-modal-close');
+        const modalImg = document.getElementById('qr-modal-img') as HTMLImageElement | null;
+        const modalTitle = document.getElementById('qr-modal-title');
+        const modalName = document.getElementById('qr-modal-name');
+        const modalNumber = document.getElementById('qr-modal-number');
+        const modalDownload = document.getElementById('qr-modal-download') as HTMLAnchorElement | null;
+        const modalLink = document.getElementById('qr-modal-link') as HTMLAnchorElement | null;
+        const triggers = document.querySelectorAll('[data-qr-trigger]');
+
+        // Move modal directly under document.body so parent CSS transforms never break viewport centering
+        if (modal && modal.parentElement !== document.body) {
+            document.body.appendChild(modal);
+        }
+
+        const openModal = (btn: HTMLElement) => {
+            if (!modal) return;
+            const src = btn.dataset.qrSrc || '';
+            const method = btn.dataset.qrMethod || 'Donation QR';
+            const accName = btn.dataset.qrName || '';
+            const accNumber = btn.dataset.qrNumber || '';
+            const payLink = btn.dataset.qrLink || '';
+
+            if (modalImg) modalImg.src = src;
+            if (modalTitle) modalTitle.textContent = method;
+            if (modalName) modalName.textContent = accName;
+            if (modalNumber) modalNumber.textContent = accNumber;
+            if (modalDownload) {
+                modalDownload.href = src;
+                modalDownload.download = `${method.replace(/\s+/g, '-')}-QR.png`;
+            }
+
+            if (modalLink) {
+                if (payLink) {
+                    modalLink.href = payLink;
+                    modalLink.classList.remove('hidden');
+                    modalLink.classList.add('inline-flex');
+                } else {
+                    modalLink.classList.add('hidden');
+                    modalLink.classList.remove('inline-flex');
+                }
+            }
+
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            document.body.style.overflow = 'hidden';
+        };
+
+        const closeModal = () => {
+            if (!modal) return;
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+            document.body.style.overflow = '';
+        };
+
+        triggers.forEach((btn) => {
+            btn.addEventListener('click', (e) => {
+                e.preventDefault();
+                openModal(btn as HTMLElement);
+            });
+        });
+
+        closeBtn?.addEventListener('click', closeModal);
+
+        // Close when tapping the dark backdrop outside the card
+        modal?.addEventListener('click', (e) => {
+            if (modalCard && !modalCard.contains(e.target as Node)) {
+                closeModal();
+            }
+        });
+
+        // Close on Escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && modal && !modal.classList.contains('hidden')) {
+                closeModal();
+            }
+        });
+    });
+</script>

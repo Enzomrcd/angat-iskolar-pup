@@ -1,0 +1,155 @@
+---
+// src/components/ThemeSwitcher.astro
+---
+
+<div
+  id="aip-theme-widget"
+  style="position: fixed; bottom: 1.25rem; right: 1.25rem; z-index: 9991;"
+  class="hidden"
+>
+  <!-- Single-Tap Toggle Pill: Active Philippine Event <-> ANGAT Default -->
+  <div class="flex items-center bg-white border border-gray-200 shadow-xl rounded-full p-1 gap-1">
+    <button
+      type="button"
+      id="theme-btn-event"
+      class="flex items-center gap-1.5 px-3.5 py-2 rounded-full text-xs font-bold uppercase tracking-wider transition-colors duration-200 cursor-pointer touch-manipulation"
+    >
+      <span id="theme-event-dot" class="w-2.5 h-2.5 rounded-full bg-aip-cerise"></span>
+      <span id="theme-event-label">PH Event</span>
+    </button>
+
+    <button
+      type="button"
+      id="theme-btn-default"
+      class="flex items-center gap-1.5 px-3.5 py-2 rounded-full text-xs font-bold uppercase tracking-wider transition-colors duration-200 cursor-pointer touch-manipulation"
+    >
+      <span class="w-2.5 h-2.5 rounded-full bg-[#e4417b]"></span>
+      <span>Default</span>
+    </button>
+  </div>
+</div>
+
+<script>
+  const OCCASION_LABELS: Record<string, string> = {
+    'bagong-taon': 'Bagong Taon',
+    kalayaan: 'Araw ng Kalayaan',
+    pride: 'Pride Month',
+    'buwan-ng-wika': 'Buwan ng Wika',
+    anniversary: 'AIP Anniversary',
+    undas: 'Undas',
+    pasko: 'Paskong Pinoy',
+  };
+
+  function getPhilippineOccasionTheme(): { id: string; label: string } {
+    const phDateStr = new Date().toLocaleDateString('en-US', {
+      timeZone: 'Asia/Manila',
+      month: 'numeric',
+      day: 'numeric',
+    });
+    const [month, day] = phDateStr.split('/').map(Number);
+
+    // Dec 31 – Jan 7: Bagong Taon
+    if ((month === 12 && day === 31) || (month === 1 && day <= 7)) {
+      return { id: 'bagong-taon', label: 'Bagong Taon' };
+    }
+    // Jun 10 – Jun 14: Araw ng Kalayaan
+    if (month === 6 && day >= 10 && day <= 14) {
+      return { id: 'kalayaan', label: 'Araw ng Kalayaan' };
+    }
+    // Jun 1 – Jun 30: Pride Month
+    if (month === 6) {
+      return { id: 'pride', label: 'Pride Month' };
+    }
+    // Aug 1 – Aug 31: Buwan ng Wika
+    if (month === 8) {
+      return { id: 'buwan-ng-wika', label: 'Buwan ng Wika' };
+    }
+    // Oct 1 – Oct 10: ANGAT Iskolar PUP Founding Anniversary (Oct 7)
+    if (month === 10 && day >= 1 && day <= 10) {
+      return { id: 'anniversary', label: 'AIP Anniversary' };
+    }
+    // Oct 28 – Nov 3: Undas / Halloween
+    if ((month === 10 && day >= 28) || (month === 11 && day <= 3)) {
+      return { id: 'undas', label: 'Undas' };
+    }
+    // Dec 1 – Dec 30: Paskong Pinoy (Christmas Season)
+    if (month === 12 && day <= 30) {
+      return { id: 'pasko', label: 'Paskong Pinoy' };
+    }
+
+    return { id: 'default', label: 'ANGAT Default' };
+  }
+
+  function syncThemeToggleUI() {
+    const widget = document.getElementById('aip-theme-widget');
+    const eventBtn = document.getElementById('theme-btn-event');
+    const defaultBtn = document.getElementById('theme-btn-default');
+    const eventLabel = document.getElementById('theme-event-label');
+
+    // Keep widget attached directly to document.body
+    if (widget && widget.parentElement !== document.body) {
+      document.body.appendChild(widget);
+    }
+
+    const detected = getPhilippineOccasionTheme();
+    const pref = localStorage.getItem('aip-theme-pref') || 'auto';
+
+    // Support both automatic Manila date detection and manual localStorage testing overrides
+    const activeEvent =
+      detected.id !== 'default'
+        ? detected
+        : pref !== 'auto' && pref !== 'default'
+          ? { id: pref, label: OCCASION_LABELS[pref] || pref }
+          : null;
+
+    if (!activeEvent) {
+      document.documentElement.removeAttribute('data-theme');
+      widget?.classList.add('hidden');
+      return;
+    }
+
+    widget?.classList.remove('hidden');
+    if (eventLabel) {
+      eventLabel.textContent = activeEvent.label;
+    }
+
+    const isUsingEvent = pref !== 'default';
+
+    if (isUsingEvent) {
+      document.documentElement.setAttribute('data-theme', activeEvent.id);
+      eventBtn?.classList.add('bg-aip-cerise', 'text-white', 'shadow-sm');
+      eventBtn?.classList.remove('text-gray-600', 'hover:text-gray-900');
+      defaultBtn?.classList.remove('bg-[#e4417b]', 'text-white', 'shadow-sm');
+      defaultBtn?.classList.add('text-gray-600', 'hover:text-gray-900');
+    } else {
+      document.documentElement.removeAttribute('data-theme');
+      defaultBtn?.classList.add('bg-[#e4417b]', 'text-white', 'shadow-sm');
+      defaultBtn?.classList.remove('text-gray-600', 'hover:text-gray-900');
+      eventBtn?.classList.remove('bg-aip-cerise', 'text-white', 'shadow-sm');
+      eventBtn?.classList.add('text-gray-600', 'hover:text-gray-900');
+    }
+  }
+
+  document.addEventListener('astro:page-load', () => {
+    const eventBtn = document.getElementById('theme-btn-event');
+    const defaultBtn = document.getElementById('theme-btn-default');
+
+    syncThemeToggleUI();
+
+    eventBtn?.addEventListener('click', () => {
+      const detected = getPhilippineOccasionTheme();
+      const targetPref = detected.id !== 'default' ? 'auto' : (sessionStorage.getItem('aip-preview-event') || 'auto');
+      localStorage.setItem('aip-theme-pref', targetPref);
+      syncThemeToggleUI();
+    });
+
+    defaultBtn?.addEventListener('click', () => {
+      const currentAttr = document.documentElement.getAttribute('data-theme');
+      if (currentAttr) {
+        sessionStorage.setItem('aip-preview-event', currentAttr);
+      }
+      localStorage.setItem('aip-theme-pref', 'default');
+      syncThemeToggleUI();
+    });
+  });
+</script>

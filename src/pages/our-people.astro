@@ -1,20 +1,122 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Hero from '../components/Hero.astro';
+import { getCollection } from 'astro:content';
+
+const allPeople = await getCollection('people');
+const terms = Array.from(new Set(allPeople.map(p => p.data.term_year))).sort().reverse();
+
+const peopleByTerm = terms.reduce((acc, term) => {
+    const peopleInTerm = allPeople.filter(p => p.data.term_year === term);
+    
+    const groupedByOrder = peopleInTerm.reduce((orderAcc, person) => {
+        const order = person.data.order;
+        if (!orderAcc[order]) {
+            orderAcc[order] = [];
+        }
+        orderAcc[order].push(person);
+        return orderAcc;
+    }, {} as Record<number, typeof allPeople>);
+
+    const sortedOrders = Object.keys(groupedByOrder).map(Number).sort((a, b) => a - b);
+    acc[term] = sortedOrders.map(order => groupedByOrder[order]);
+    return acc;
+}, {} as Record<string, (typeof allPeople)[][]>);
 ---
 
 <BaseLayout title="Our People | Angat Iskolar PUP">
     <Hero title="OUR PEOPLE" />
 
-    <!-- People Hierarchy Section (on white background) -->
-    <div class="max-w-6xl mx-auto px-6 py-16 flex flex-col items-center bg-transparent">
-        <div class="bg-gradient-to-r from-aip-cerise to-aip-punch text-white px-8 py-2 rounded-full shadow-md mb-16">
-            <h2 class="text-lg md:text-xl font-bold tracking-wider">[Term Year Pending]</h2>
-        </div>
+    <div class="max-w-6xl mx-auto px-2 sm:px-6 py-16 flex flex-col items-center bg-transparent">
         
-        <div class="text-gray-700 text-center border-2 border-dashed border-gray-300 rounded-2xl p-12 w-full max-w-4xl">
-            <p class="text-xl font-bold">[Content Pending from CMS]</p>
-            <p class="mt-2 text-gray-500">The hierarchical portrait pyramid will be dynamically generated here based on the active term.</p>
-        </div>
+        {terms.length === 0 ? (
+            <div class="text-gray-700 text-center border-2 border-dashed border-gray-300 rounded-2xl p-12 w-full max-w-4xl">
+                <p class="text-xl font-bold">[Content Pending from CMS]</p>
+                <p class="mt-2 text-gray-500">The hierarchical portrait pyramid will be dynamically generated here based on the active term.</p>
+            </div>
+        ) : (
+            <>
+                <div class="flex items-center justify-center gap-3 mb-12 sm:mb-16">
+                    {terms.map((term, index) => (
+                        <button
+                            data-term-btn={term}
+                            class={`term-tab-btn px-6 sm:px-8 py-2 sm:py-2.5 rounded-full font-bold text-sm sm:text-base md:text-lg tracking-wider transition-all duration-300 shadow-md touch-manipulation active:scale-95 ${
+                                index === 0
+                                    ? 'bg-gradient-to-r from-aip-cerise to-aip-punch text-white shadow-aip-punch/30 scale-105'
+                                    : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-50'
+                            }`}
+                        >
+                            {term}
+                        </button>
+                    ))}
+                </div>
+
+                {terms.map((term, termIndex) => (
+                    <div 
+                        id={`term-${term}`} 
+                        class={`term-group flex flex-col items-center space-y-6 sm:space-y-8 md:space-y-10 w-full transition-all duration-300 ${termIndex === 0 ? '' : 'hidden'}`}
+                    >
+                        {peopleByTerm[term].map((row) => (
+                            <div class="flex flex-row flex-wrap justify-center items-start gap-2 sm:gap-6 md:gap-8 w-full max-w-5xl">
+                                {row.map((person, index) => (
+                                    <div class={`cursor-pointer animate-fade-in-up delay-${(index % 5) * 100} flex flex-col items-center text-center p-3 sm:p-5 bg-white rounded-2xl sm:rounded-3xl shadow-md border border-gray-100 w-[100px] sm:w-44 md:w-52 transition-all duration-500 transform hover:-translate-y-2 hover:scale-[1.02] hover:shadow-xl active:scale-95 active:translate-y-0 active:shadow-inner`}>
+                                        
+                                        {person.data.image ? (
+                                            <img 
+                                                src={person.data.image} 
+                                                alt={person.data.title} 
+                                                class="w-14 h-14 sm:w-20 sm:h-20 md:w-24 md:h-24 rounded-full object-cover aspect-square mb-2 sm:mb-4 shadow-sm border-2 border-aip-cerise/30" 
+                                            />
+                                        ) : (
+                                            <div class="w-14 h-14 sm:w-20 sm:h-20 md:w-24 md:h-24 rounded-full bg-gray-100 flex items-center justify-center mb-2 sm:mb-4 shadow-sm border-2 border-gray-200 aspect-square">
+                                                <svg class="w-6 h-6 sm:w-10 sm:h-10 text-gray-400" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                                    <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"></path>
+                                                </svg>
+                                            </div>
+                                        )}
+                                        
+                                        <h3 class="text-[9px] sm:text-xs md:text-sm font-bold text-gray-900 uppercase tracking-tight leading-tight sm:leading-snug mb-0.5 sm:mb-1">
+                                            {person.data.title}
+                                        </h3>
+                                        <p class="text-[7px] sm:text-[9px] md:text-[10px] font-bold text-aip-cerise uppercase tracking-wider leading-tight">
+                                            {person.data.role}
+                                        </p>
+                                    </div>
+                                ))}
+                            </div>
+                        ))}
+                    </div>
+                ))}
+            </>
+        )}
     </div>
 </BaseLayout>
+
+<script>
+    document.addEventListener('astro:page-load', () => {
+        const buttons = document.querySelectorAll('.term-tab-btn');
+        const groups = document.querySelectorAll('.term-group');
+
+        buttons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const selectedTerm = btn.getAttribute('data-term-btn');
+
+                buttons.forEach(b => {
+                    b.classList.remove('bg-gradient-to-r', 'from-aip-cerise', 'to-aip-punch', 'text-white', 'shadow-aip-punch/30', 'scale-105');
+                    b.classList.add('bg-white', 'text-gray-600', 'border', 'border-gray-200');
+                });
+
+                btn.classList.remove('bg-white', 'text-gray-600', 'border', 'border-gray-200');
+                btn.classList.add('bg-gradient-to-r', 'from-aip-cerise', 'to-aip-punch', 'text-white', 'shadow-aip-punch/30', 'scale-105');
+
+                groups.forEach(group => {
+                    if (group.id === `term-${selectedTerm}`) {
+                        group.classList.remove('hidden');
+                    } else {
+                        group.classList.add('hidden');
+                    }
+                });
+            });
+        });
+    });
+</script>

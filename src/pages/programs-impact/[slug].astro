@@ -1,0 +1,478 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Hero from '../../components/Hero.astro';
+import { getCollection, render } from 'astro:content';
+
+export async function getStaticPaths() {
+    const programEntries = await getCollection('programs');
+    return programEntries.map(entry => ({
+        params: { slug: entry.id },
+        props: { entry },
+    }));
+}
+
+const { entry } = Astro.props;
+const { Content } = await render(entry);
+
+interface EditionItem {
+    year: string;
+    title?: string;
+    date?: Date;
+    summary?: string;
+    gallery?: string[];
+}
+
+const rawEditions: EditionItem[] = entry.data.editions && entry.data.editions.length > 0
+    ? entry.data.editions
+    : (entry.data.date || (entry.data.gallery && entry.data.gallery.length > 0))
+        ? [{
+            year: entry.data.date ? new Date(entry.data.date).getFullYear().toString() : '2026',
+            title: undefined,
+            date: entry.data.date,
+            summary: '',
+            gallery: entry.data.gallery || []
+          }]
+        : [];
+
+// Group editions by normalized year so duplicate years share a single Year tab button
+const editionsByYearMap = new Map<string, EditionItem[]>();
+for (const ed of rawEditions) {
+    const yr = (ed.year || '2026').trim();
+    if (!editionsByYearMap.has(yr)) {
+        editionsByYearMap.set(yr, []);
+    }
+    editionsByYearMap.get(yr)!.push(ed);
+}
+
+// Sort year groups newest-first, and sort sessions within the same year newest-first
+const groupedEditions = Array.from(editionsByYearMap.entries())
+    .sort(([yearA], [yearB]) => yearB.localeCompare(yearA))
+    .map(([year, items]) => ({
+        year,
+        items: items.sort((a, b) => {
+            if (!a.date || !b.date) return 0;
+            return new Date(b.date).getTime() - new Date(a.date).getTime();
+        }),
+    }));
+
+const isFlagship = (entry.data.program_type || 'Flagship Program') === 'Flagship Program';
+---
+
+<BaseLayout title={`${entry.data.title} | Angat Iskolar PUP`}>
+    <Hero title={entry.data.title} />
+
+    <div class="max-w-4xl mx-auto px-6 py-16 bg-transparent animate-fade-in-up">
+        
+        {/* Header Tags */}
+        <div class="flex flex-wrap items-center gap-3 mb-8 border-b border-gray-200 pb-6">
+            <span class="bg-aip-plum/10 text-aip-plum text-sm font-bold px-4 py-1.5 rounded-full uppercase tracking-wider">
+                {entry.data.category}
+            </span>
+            {entry.data.committee && (
+                <span class="bg-aip-cerise/10 text-aip-cerise text-sm font-bold px-4 py-1.5 rounded-full">
+                    {entry.data.committee}
+                </span>
+            )}
+            {!isFlagship && entry.data.date && (
+                <span class="text-gray-500 font-semibold ml-auto">
+                    {new Date(entry.data.date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
+                </span>
+            )}
+        </div>
+
+        {/* General Program Overview */}
+        <div class="prose prose-lg max-w-none text-gray-700 leading-relaxed mb-12">
+            <Content />
+        </div>
+
+        {/* Annual Editions / Event Gallery Section */}
+        {groupedEditions.length > 0 && (
+            <div class="mt-12 border-t border-gray-200 pt-12">
+                {isFlagship && (
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
+                        <h3 class="text-2xl font-bold text-gray-900 uppercase tracking-wide">Annual Editions</h3>
+                        <div class="flex flex-wrap gap-2.5">
+                            {groupedEditions.map((group, idx) => (
+                                <button
+                                    type="button"
+                                    data-edition-target={`edition-panel-${idx}`}
+                                    class={`edition-tab-btn px-6 py-2.5 rounded-full font-bold text-sm tracking-wide transition-all duration-300 shadow-sm cursor-pointer ${
+                                        idx === 0
+                                            ? 'bg-aip-cerise text-white'
+                                            : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-200'
+                                    }`}
+                                >
+                                    {group.year}
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+                )}
+
+                {groupedEditions.map((group, idx) => {
+                    const hasMultipleSlides = group.items.length > 1;
+                    return (
+                        <div
+                            id={`edition-panel-${idx}`}
+                            data-carousel-container
+                            class={`edition-panel ${idx === 0 ? 'block' : 'hidden'} animate-fade-in-up`}
+                        >
+                            {/* Session Slideshow Navigation Bar (Only shown when a year has 2+ sessions) */}
+                            {isFlagship && hasMultipleSlides && (
+                                <div class="flex items-center justify-between bg-aip-plum/5 border border-aip-plum/15 rounded-2xl px-5 py-3.5 mb-6">
+                                    <div class="flex items-center gap-3">
+                                        <span class="text-xs font-bold uppercase tracking-wider text-aip-plum">
+                                            {group.year} Sessions
+                                        </span>
+                                        <span
+                                            data-slide-counter
+                                            class="bg-white text-aip-cerise text-xs font-bold px-3 py-1 rounded-full shadow-sm border border-gray-100"
+                                        >
+                                            1 / {group.items.length}
+                                        </span>
+                                    </div>
+
+                                    <div class="flex items-center gap-3">
+                                        <div class="hidden sm:flex items-center gap-1.5 mr-2">
+                                            {group.items.map((_, dotIdx) => (
+                                                <button
+                                                    type="button"
+                                                    data-slide-dot={dotIdx}
+                                                    aria-label={`Go to session ${dotIdx + 1}`}
+                                                    class={`h-2.5 rounded-full transition-all duration-300 cursor-pointer ${
+                                                        dotIdx === 0
+                                                            ? 'w-6 bg-aip-cerise'
+                                                            : 'w-2.5 bg-gray-300 hover:bg-gray-400'
+                                                    }`}
+                                                />
+                                            ))}
+                                        </div>
+
+                                        <button
+                                            type="button"
+                                            data-slide-prev
+                                            aria-label="Previous event"
+                                            class="w-10 h-10 rounded-full bg-white text-gray-800 hover:bg-aip-cerise hover:text-white border border-gray-200 shadow-sm flex items-center justify-center transition-all duration-200 active:scale-95 cursor-pointer"
+                                        >
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7" />
+                                            </svg>
+                                        </button>
+
+                                        <button
+                                            type="button"
+                                            data-slide-next
+                                            aria-label="Next event"
+                                            class="w-10 h-10 rounded-full bg-white text-gray-800 hover:bg-aip-cerise hover:text-white border border-gray-200 shadow-sm flex items-center justify-center transition-all duration-200 active:scale-95 cursor-pointer"
+                                        >
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7" />
+                                            </svg>
+                                        </button>
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* Session Slides Track */}
+                            <div class="relative">
+                                {group.items.map((ed, itemIdx) => {
+                                    const formattedEditionDate = ed.date
+                                        ? new Date(ed.date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })
+                                        : '';
+                                    const sessionHeading = ed.title && ed.title.trim().length > 0
+                                        ? ed.title.trim()
+                                        : `${entry.data.title} ${group.year}`;
+                                    const photoCount = ed.gallery ? ed.gallery.length : 0;
+
+                                    return (
+                                        <div
+                                            data-carousel-slide
+                                            class={`${itemIdx === 0 ? 'block' : 'hidden'} animate-fade-in-up`}
+                                        >
+                                            {isFlagship && (
+                                                <div class="bg-gray-50 rounded-2xl p-6 mb-8 border border-gray-100">
+                                                    <div class={`flex flex-wrap items-center justify-between gap-2 ${ed.summary ? 'mb-3' : ''}`}>
+                                                        <h4 class="text-xl font-bold text-aip-plum">
+                                                            {sessionHeading}
+                                                        </h4>
+                                                        {formattedEditionDate && (
+                                                            <span class="text-sm font-semibold text-gray-500">{formattedEditionDate}</span>
+                                                        )}
+                                                    </div>
+                                                    {ed.summary && (
+                                                        <p class="text-gray-700 leading-relaxed whitespace-pre-line">{ed.summary}</p>
+                                                    )}
+                                                </div>
+                                            )}
+
+                                            {ed.gallery && photoCount > 0 ? (
+                                                <div data-photo-gallery>
+                                                    <div class="flex items-center justify-between mb-5">
+                                                        <h4 class="text-sm font-bold text-gray-500 uppercase tracking-wider">
+                                                            Event Gallery
+                                                        </h4>
+                                                        {photoCount > 1 && (
+                                                            <span
+                                                                data-photo-counter
+                                                                class="sm:hidden bg-aip-plum/10 text-aip-plum text-xs font-bold px-3 py-1 rounded-full"
+                                                            >
+                                                                1 / {photoCount}
+                                                            </span>
+                                                        )}
+                                                    </div>
+
+                                                    {/* Responsive Gallery: Mobile Slideshow (< sm) -> Desktop Multi-Column Grid (>= sm) */}
+                                                    <div class="relative">
+                                                        <div
+                                                            data-photo-track
+                                                            class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
+                                                        >
+                                                            {ed.gallery.map((imgUrl, photoIdx) => (
+                                                                <div
+                                                                    data-photo-item
+                                                                    class={`${photoIdx === 0 ? 'block' : 'hidden sm:block'} overflow-hidden rounded-2xl shadow-md border border-gray-100 hover:shadow-xl transition-all duration-300 bg-white`}
+                                                                >
+                                                                    <img
+                                                                        src={imgUrl}
+                                                                        alt={`${sessionHeading} photo ${photoIdx + 1}`}
+                                                                        loading="lazy"
+                                                                        class="w-full h-72 sm:h-64 object-cover hover:scale-105 transition-transform duration-500 select-none"
+                                                                    />
+                                                                </div>
+                                                            ))}
+                                                        </div>
+
+                                                        {/* Mobile-Only Prev / Next Overlay Controls */}
+                                                        {photoCount > 1 && (
+                                                            <>
+                                                                <button
+                                                                    type="button"
+                                                                    data-photo-prev
+                                                                    aria-label="Previous photo"
+                                                                    class="sm:hidden absolute left-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/90 backdrop-blur-sm text-gray-900 hover:bg-aip-cerise hover:text-white shadow-lg border border-gray-200/80 flex items-center justify-center transition-all duration-200 active:scale-90 touch-manipulation cursor-pointer z-10"
+                                                                >
+                                                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7" />
+                                                                    </svg>
+                                                                </button>
+                                                                <button
+                                                                    type="button"
+                                                                    data-photo-next
+                                                                    aria-label="Next photo"
+                                                                    class="sm:hidden absolute right-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/90 backdrop-blur-sm text-gray-900 hover:bg-aip-cerise hover:text-white shadow-lg border border-gray-200/80 flex items-center justify-center transition-all duration-200 active:scale-90 touch-manipulation cursor-pointer z-10"
+                                                                >
+                                                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7" />
+                                                                    </svg>
+                                                                </button>
+                                                            </>
+                                                        )}
+                                                    </div>
+
+                                                    {/* Mobile-Only Dot Indicators */}
+                                                    {photoCount > 1 && (
+                                                        <div class="sm:hidden flex flex-wrap justify-center items-center gap-1.5 mt-4 px-2">
+                                                            {ed.gallery.map((_, dotIdx) => (
+                                                                <button
+                                                                    type="button"
+                                                                    data-photo-dot={dotIdx}
+                                                                    aria-label={`View photo ${dotIdx + 1}`}
+                                                                    class={`h-2 rounded-full transition-all duration-300 cursor-pointer ${
+                                                                        dotIdx === 0
+                                                                            ? 'w-5 bg-aip-cerise'
+                                                                            : 'w-2 bg-gray-300 hover:bg-gray-400'
+                                                                    }`}
+                                                                />
+                                                            ))}
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            ) : (
+                                                isFlagship && !ed.summary && (
+                                                    <div class="text-center text-gray-500 border-2 border-dashed border-gray-200 rounded-2xl p-8">
+                                                        Photos and highlights for {sessionHeading} will be uploaded soon.
+                                                    </div>
+                                                )
+                                            )}
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        </div>
+                    );
+                })}
+            </div>
+        )}
+        
+        {/* Back Button */}
+        <div class="mt-16 text-center">
+            <a href="/programs-impact" class="inline-flex items-center justify-center gap-2 bg-gray-100 text-gray-700 hover:bg-aip-cerise hover:text-white px-8 py-3 rounded-full font-bold shadow-sm transition-colors duration-300 active:scale-95 touch-manipulation">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                </svg>
+                Back to Programs
+            </a>
+        </div>
+    </div>
+</BaseLayout>
+
+<script>
+    document.addEventListener('astro:page-load', () => {
+        const tabBtns = document.querySelectorAll('.edition-tab-btn');
+        const panels = document.querySelectorAll('.edition-panel');
+
+        // 1. Initialize mobile photo slideshows inside every gallery
+        const galleries = document.querySelectorAll('[data-photo-gallery]');
+        galleries.forEach((gallery) => {
+            const items = gallery.querySelectorAll('[data-photo-item]');
+            if (items.length <= 1) return;
+
+            const prevBtn = gallery.querySelector('[data-photo-prev]');
+            const nextBtn = gallery.querySelector('[data-photo-next]');
+            const counter = gallery.querySelector('[data-photo-counter]');
+            const dots = gallery.querySelectorAll('[data-photo-dot]');
+            const track = gallery.querySelector('[data-photo-track]') as HTMLElement | null;
+
+            let currentPhoto = 0;
+
+            const showPhoto = (index: number) => {
+                const total = items.length;
+                currentPhoto = ((index % total) + total) % total;
+
+                items.forEach((item, idx) => {
+                    if (idx === currentPhoto) {
+                        item.classList.remove('hidden');
+                        item.classList.add('block');
+                    } else {
+                        item.classList.add('hidden');
+                        item.classList.remove('block');
+                        item.classList.add('sm:block');
+                    }
+                });
+
+                if (counter) {
+                    counter.textContent = `${currentPhoto + 1} / ${total}`;
+                }
+
+                dots.forEach((dot, idx) => {
+                    if (idx === currentPhoto) {
+                        dot.classList.remove('w-2', 'bg-gray-300', 'hover:bg-gray-400');
+                        dot.classList.add('w-5', 'bg-aip-cerise');
+                    } else {
+                        dot.classList.remove('w-5', 'bg-aip-cerise');
+                        dot.classList.add('w-2', 'bg-gray-300', 'hover:bg-gray-400');
+                    }
+                });
+            };
+
+            prevBtn?.addEventListener('click', () => showPhoto(currentPhoto - 1));
+            nextBtn?.addEventListener('click', () => showPhoto(currentPhoto + 1));
+
+            dots.forEach((dot, idx) => {
+                dot.addEventListener('click', () => showPhoto(idx));
+            });
+
+            // Touch swipe support on mobile
+            if (track) {
+                let touchStartX = 0;
+                track.addEventListener('touchstart', (e) => {
+                    touchStartX = e.changedTouches[0].screenX;
+                }, { passive: true });
+
+                track.addEventListener('touchend', (e) => {
+                    if (window.innerWidth >= 640) return;
+                    const touchEndX = e.changedTouches[0].screenX;
+                    const deltaX = touchEndX - touchStartX;
+                    if (Math.abs(deltaX) > 40) {
+                        if (deltaX < 0) {
+                            showPhoto(currentPhoto + 1);
+                        } else {
+                            showPhoto(currentPhoto - 1);
+                        }
+                    }
+                }, { passive: true });
+            }
+        });
+
+        // 2. Initialize per-year session slideshows
+        const carouselResetters = new Map<string, () => void>();
+
+        panels.forEach((panel) => {
+            const slides = panel.querySelectorAll('[data-carousel-slide]');
+            if (slides.length <= 1) return;
+
+            const prevBtn = panel.querySelector('[data-slide-prev]');
+            const nextBtn = panel.querySelector('[data-slide-next]');
+            const counter = panel.querySelector('[data-slide-counter]');
+            const dots = panel.querySelectorAll('[data-slide-dot]');
+
+            let currentIndex = 0;
+
+            const showSlide = (index: number) => {
+                const total = slides.length;
+                currentIndex = ((index % total) + total) % total;
+
+                slides.forEach((slide, idx) => {
+                    if (idx === currentIndex) {
+                        slide.classList.remove('hidden');
+                        slide.classList.add('block');
+                    } else {
+                        slide.classList.add('hidden');
+                        slide.classList.remove('block');
+                    }
+                });
+
+                if (counter) {
+                    counter.textContent = `${currentIndex + 1} / ${total}`;
+                }
+
+                dots.forEach((dot, idx) => {
+                    if (idx === currentIndex) {
+                        dot.classList.remove('w-2.5', 'bg-gray-300', 'hover:bg-gray-400');
+                        dot.classList.add('w-6', 'bg-aip-cerise');
+                    } else {
+                        dot.classList.remove('w-6', 'bg-aip-cerise');
+                        dot.classList.add('w-2.5', 'bg-gray-300', 'hover:bg-gray-400');
+                    }
+                });
+            };
+
+            prevBtn?.addEventListener('click', () => showSlide(currentIndex - 1));
+            nextBtn?.addEventListener('click', () => showSlide(currentIndex + 1));
+
+            dots.forEach((dot, idx) => {
+                dot.addEventListener('click', () => showSlide(idx));
+            });
+
+            if (panel.id) {
+                carouselResetters.set(panel.id, () => showSlide(0));
+            }
+        });
+
+        // 3. Year tab switching
+        tabBtns.forEach((btn) => {
+            btn.addEventListener('click', () => {
+                const targetId = (btn as HTMLElement).dataset.editionTarget;
+
+                tabBtns.forEach((b) => {
+                    b.classList.remove('bg-aip-cerise', 'text-white');
+                    b.classList.add('bg-white', 'text-gray-700', 'hover:bg-gray-50', 'border', 'border-gray-200');
+                });
+                btn.classList.remove('bg-white', 'text-gray-700', 'hover:bg-gray-50', 'border', 'border-gray-200');
+                btn.classList.add('bg-aip-cerise', 'text-white');
+
+                panels.forEach((panel) => {
+                    if (panel.id === targetId) {
+                        panel.classList.remove('hidden');
+                        panel.classList.add('block');
+                        const resetFn = carouselResetters.get(panel.id);
+                        if (resetFn) resetFn();
+                    } else {
+                        panel.classList.add('hidden');
+                        panel.classList.remove('block');
+                    }
+                });
+            });
+        });
+    });
+</script>

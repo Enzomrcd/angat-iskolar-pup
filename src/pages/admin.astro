@@ -1,0 +1,21 @@
+---
+// src/pages/admin.astro
+// This page bypasses our BaseLayout to give Decap CMS full control of the screen.
+---
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AIP Content Manager</title>
+    <link rel="icon" type="image/png" href="/images/logos/icon_logo.png" />
+    
+    <!-- Explicitly tell Decap CMS where to find the config file -->
+    <link href="/admin/config.yml" type="text/yaml" rel="cms-config-url" />
+  </head>
+  <body>
+    <!-- Decap CMS Script loaded directly -->
+    <script is:inline src="https://unpkg.com/decap-cms@^3.0.0/dist/decap-cms.js"></script>
+  </body>
+</html>

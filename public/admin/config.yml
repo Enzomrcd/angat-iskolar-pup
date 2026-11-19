@@ -1,0 +1,109 @@
+# public/admin/config.yml
+backend:
+  name: git-gateway
+  branch: main
+  
+local_backend: true
+
+media_folder: "public/images/uploads"
+public_folder: "/images/uploads"
+
+collections:
+  - name: "people"
+    label: "Our People"
+    folder: "src/content/people"
+    create: true
+    slug: "{{slug}}"
+    fields:
+      - { label: "Name", name: "title", widget: "string" }
+      - { label: "Role/Position", name: "role", widget: "string" }
+      - { label: "Term Year", name: "term_year", widget: "string" }
+      - { label: "Hierarchy Order", name: "order", widget: "number", value_type: "int", default: 99 }
+      - { label: "Profile Photo", name: "image", widget: "image", required: false }
+      - { label: "Biography", name: "body", widget: "markdown", required: false }
+
+  - name: "programs"
+    label: "Programs & Impact"
+    folder: "src/content/programs"
+    create: true
+    slug: "{{slug}}"
+    fields:
+      - { label: "Program Title", name: "title", widget: "string" }
+      - label: "Program Type"
+        name: "program_type"
+        widget: "select"
+        options: ["Flagship Program", "Committee Initiative"]
+        default: "Flagship Program"
+      - label: "Lead Committee"
+        name: "committee"
+        widget: "select"
+        required: false
+        hint: "Select a committee if this is a Committee Initiative"
+        options:
+          - "Committee on Education"
+          - "Committee on Environmental & Agricultural Development"
+          - "Committee on Gender Equality & Social Harmony"
+          - "Committee on Good Governance"
+          - "Committee on Health"
+      - { label: "Advocacy Tag / Sub-category", name: "category", widget: "string", hint: "e.g., Community Service, Environmental, Education" }
+      - { label: "Main Cover Image", name: "image", widget: "image", required: false }
+      - { label: "Short Excerpt (Card Summary)", name: "excerpt", widget: "text", required: false }
+      - { label: "General Program Overview", name: "body", widget: "markdown" }
+      
+      # Annual Editions (Supports multiple runs per year under the same Year tab)
+      - label: "Annual Editions (For Flagship Programs)"
+        name: "editions"
+        widget: "list"
+        required: false
+        hint: "Add each run of this program. Multiple runs with the same Year will automatically group under that single Year tab."
+        fields:
+          - { label: "Year", name: "year", widget: "string", default: "2026" }
+          - { label: "Edition / Session Title", name: "title", widget: "string", required: false, hint: "Optional custom title for this run (e.g., CLP: T.H.U.M.B.S). Defaults to Program Title + Year if blank." }
+          - { label: "Event Date", name: "date", widget: "datetime", format: "YYYY-MM-DD", required: false }
+          - { label: "Edition Highlights / Recap", name: "summary", widget: "markdown", required: false }
+          - label: "Edition Gallery"
+            name: "gallery"
+            widget: "list"
+            required: false
+            field: { label: "Image", name: "image", widget: "image" }
+
+      # Single-event fields (For Committee Initiatives or legacy entries)
+      - { label: "Event Date (For Committee Initiatives)", name: "date", widget: "datetime", format: "YYYY-MM-DD", required: false }
+      - label: "Event Gallery (For Committee Initiatives)"
+        name: "gallery"
+        widget: "list"
+        required: false
+        field: { label: "Image", name: "image", widget: "image" }
+
+  - name: "archives"
+    label: "Archives & Reports"
+    folder: "src/content/archives"
+    create: true
+    slug: "{{slug}}"
+    fields:
+      - { label: "Document Title", name: "title", widget: "string" }
+      - { label: "Category", name: "category", widget: "string" }
+      - { label: "Year", name: "year", widget: "string" }
+      - { label: "Upload Document", name: "document", widget: "file" }
+      - { label: "Notes", name: "body", widget: "markdown", required: false }
+
+  - name: "settings"
+    label: "Site Settings"
+    files:
+      - label: "Global Configuration"
+        name: "global"
+        file: "src/content/settings/global.md"
+        fields:
+          - { label: "Home Page Subtitle", name: "home_subtitle", widget: "string", default: "Iskolar para sa Bayan" }
+          - { label: "Footer Description", name: "footer_desc", widget: "text", default: "A student-led volunteer initiative dedicated to public service." }
+          - { label: "Contact Email", name: "contact_email", widget: "string", default: "angatiskolarpup@gmail.com" }
+          - label: "Donation Methods"
+            name: "donation_methods"
+            widget: "list"
+            required: false
+            fields:
+              - { label: "Bank/Wallet Name (e.g., GCash, BDO)", name: "method", widget: "string" }
+              - { label: "Account Name", name: "account_name", widget: "string" }
+              - { label: "Account Number", name: "account_number", widget: "string" }
+              - { label: "QR Code Image", name: "qr_code", widget: "image", required: false }
+              - { label: "App Redirect / Payment Link", name: "payment_link", widget: "string", required: false, hint: "Optional: Paste a direct link to GCash Web, Maya, or Bank Portal" }

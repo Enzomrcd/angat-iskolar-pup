@@ -1,63 +1,284 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Hero from '../components/Hero.astro';
+import { getEntry } from 'astro:content';
+
+const globalSettings = await getEntry('settings', 'global');
+const heroSubtitle = globalSettings?.data?.home_subtitle || "Iskolar ng Bayan, Iskolar para sa Bayan";
 ---
 
 <BaseLayout title="About Us | Angat Iskolar PUP">
+    <!-- Hero Section -->
     <Hero title="SERVING THE PEOPLE, THE ANGAT WAY">
-        <p class="text-lg opacity-90 mt-2">[Hero Subtitle Pending from CMS]</p>
+        <p class="text-lg md:text-2xl font-light italic mt-3 opacity-95 tracking-wide">
+            "{heroSubtitle}"
+        </p>
     </Hero>
 
-    <!-- About Us Content Section -->
-    <div class="max-w-6xl mx-auto px-6 py-16 flex flex-col items-center bg-transparent">
-        <!-- Pink Pill Header -->
-        <div class="bg-gradient-to-r from-aip-cerise to-aip-punch text-white px-12 py-3 rounded-full shadow-lg shadow-aip-punch/30 mb-12">
-            <h2 class="text-3xl md:text-4xl font-bold tracking-wide uppercase">ABOUT US</h2>
-        </div>
+    <!-- Main Interactive Slideshow Container -->
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 py-14 md:py-20 bg-transparent">
         
-        <!-- Large Text Card (Glowing Shadow) -->
-        <div class="w-full max-w-5xl bg-gradient-to-r from-aip-cerise to-aip-punch text-white p-8 md:p-12 rounded-[40px] shadow-2xl shadow-aip-punch/20 text-center md:text-lg leading-relaxed space-y-6">
-            <p>
-                Established on October 7, 2022, ANGAT Iskolar PUP traces its roots to the principle of Iskolar ng Bayan, Iskolar para sa Bayan, recognizing the community as an integral part of every Iskolar ng Bayan’s educational journey. This principle reflects AIP’s belief that education extends beyond the individual and becomes more meaningful when it contributes to the growth and development of the communities that make it possible. Grounded in this principle, AIP began as a student-led volunteer initiative dedicated to public service, community engagement, and youth leadership. Through the collective efforts of its volunteers, the organization has pursued initiatives that respond to various social needs, creating opportunities for students to apply their learning beyond the university and engage in meaningful community work.
-            </p>
-            <p>
-                Over the years, AIP has continued to develop its advocacies in Education, Environmental and Agricultural Development, Gender Equality and Social Harmony, Good Governance, and Health. Through its initiatives, the organization has fostered leadership development, community partnerships, and collaborative action. As AIP evolved, so did its internal structure. Previously composed of nine committees, the organization transitioned to five committees in the current term by merging related advocacies to strengthen coordination and encourage greater collaboration among its volunteers. Through these developments, ANGAT Iskolar PUP continues to strengthen its commitment to volunteerism, community engagement, and collective action.
-            </p>
+        <!-- Top Pill Navigation Bar + Prev/Next Controls -->
+        <div class="flex flex-col sm:flex-row items-center justify-between gap-4 mb-8 bg-white p-2.5 rounded-3xl sm:rounded-full shadow-md border border-gray-100">
+            
+            <!-- Section Pill Tabs -->
+            <div class="flex flex-wrap justify-center gap-1.5 sm:gap-2 w-full sm:w-auto">
+                <button
+                    type="button"
+                    data-about-tab="0"
+                    class="about-tab-btn px-5 py-2.5 rounded-full text-xs sm:text-sm font-bold uppercase tracking-wider transition-all duration-300 bg-aip-cerise text-white shadow-sm cursor-pointer"
+                >
+                    About Us
+                </button>
+                <button
+                    type="button"
+                    data-about-tab="1"
+                    class="about-tab-btn px-5 py-2.5 rounded-full text-xs sm:text-sm font-bold uppercase tracking-wider transition-all duration-300 bg-transparent text-gray-600 hover:text-aip-plum hover:bg-gray-50 cursor-pointer"
+                >
+                    Our Mission
+                </button>
+                <button
+                    type="button"
+                    data-about-tab="2"
+                    class="about-tab-btn px-5 py-2.5 rounded-full text-xs sm:text-sm font-bold uppercase tracking-wider transition-all duration-300 bg-transparent text-gray-600 hover:text-aip-plum hover:bg-gray-50 cursor-pointer"
+                >
+                    Our Vision
+                </button>
+            </div>
+
+            <!-- Counter & Arrow Buttons -->
+            <div class="flex items-center gap-3 pr-1">
+                <span id="about-slide-counter" class="text-xs font-bold text-gray-500 tracking-widest px-2">
+                    1 / 3
+                </span>
+                <button
+                    type="button"
+                    id="about-prev-btn"
+                    aria-label="Previous slide"
+                    class="w-10 h-10 rounded-full bg-gray-100 text-gray-800 hover:bg-aip-plum hover:text-white flex items-center justify-center transition-all duration-200 active:scale-95 touch-manipulation cursor-pointer"
+                >
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7" />
+                    </svg>
+                </button>
+                <button
+                    type="button"
+                    id="about-next-btn"
+                    aria-label="Next slide"
+                    class="w-10 h-10 rounded-full bg-gray-100 text-gray-800 hover:bg-aip-plum hover:text-white flex items-center justify-center transition-all duration-200 active:scale-95 touch-manipulation cursor-pointer"
+                >
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7" />
+                    </svg>
+                </button>
+            </div>
         </div>
-        
-        <!-- Mission and Vision Section -->
-        <div class="w-full grid grid-cols-1 md:grid-cols-2 gap-8 mt-16 max-w-5xl bg-transparent">
-            <!-- Mission Card -->
-            <div class="relative w-full h-[500px] md:h-[600px] rounded-[40px] overflow-hidden flex flex-col justify-between p-8 md:p-10 shadow-xl shadow-gray-300">
-                <div class="absolute inset-0 bg-gradient-to-b from-aip-plum/90 via-aip-plum/70 to-aip-plum/90 z-0"></div>
-                <div class="absolute inset-0 flex items-center justify-center text-white/30 z-0">
-                    <span class="text-sm font-bold uppercase tracking-widest">[Background Image Pending]</span>
-                </div>
-                <div class="relative z-10 w-full text-center mt-4">
-                    <h3 class="text-3xl font-bold text-white uppercase italic underline decoration-2 underline-offset-4 tracking-wider">OUR MISSION</h3>
-                </div>
-                <div class="relative z-10 border-l-4 border-white pl-6 text-white mb-4">
-                    <p class="text-sm md:text-base lg:text-lg leading-relaxed">
-                        The organization shall pursue to create a long-term community of the largest mobilization of volunteer Iskolar ng Bayan throughout the PUP system for community-based projects through the ten (10) centers of participation to actively partake in nation-building and help the marginalized sector of our society.
-                    </p>
+
+        <!-- Slideshow Track (Touch-Swipe Enabled) -->
+        <div id="about-slider-track" class="relative">
+            
+            <!-- SLIDE 1: ABOUT US -->
+            <div data-about-slide class="block animate-fade-in-up">
+                <div class="relative rounded-[2.5rem] bg-gradient-to-br from-aip-cerise via-aip-raspberry to-aip-plum text-white p-8 sm:p-12 md:p-16 shadow-2xl overflow-hidden min-h-[460px] md:min-h-[500px] flex flex-col justify-center">
+                    <!-- Decorative ambient glows -->
+                    <div class="absolute -top-24 -right-24 w-72 h-72 bg-white/10 rounded-full blur-3xl pointer-events-none"></div>
+                    <div class="absolute -bottom-24 -left-24 w-72 h-72 bg-aip-plum/40 rounded-full blur-3xl pointer-events-none"></div>
+
+                    <div class="relative z-10 max-w-3xl mx-auto">
+                        <div class="flex items-center justify-center mb-8">
+                            <span class="bg-white/20 backdrop-blur-md border border-white/30 text-white text-xs sm:text-sm font-bold px-6 py-2 rounded-full uppercase tracking-widest shadow-sm">
+                                About Us
+                            </span>
+                        </div>
+
+                        <div class="space-y-6 text-base sm:text-lg md:text-[19px] leading-relaxed font-normal text-white/95 text-left sm:text-justify">
+                            <p>
+                                Established on October 7, 2022, ANGAT Iskolar PUP traces its roots to the principle of <strong class="font-bold text-white">Iskolar ng Bayan, Iskolar para sa Bayan</strong>, recognizing the community as an integral part of every Iskolar ng Bayan’s educational journey. This principle reflects AIP’s belief that education extends beyond the individual and becomes more meaningful when it contributes to the growth and development of the communities that make it possible. Grounded in this principle, AIP began as a student-led volunteer initiative dedicated to public service, community engagement, and youth leadership. Through the collective efforts of its volunteers, the organization has pursued initiatives that respond to various social needs, creating opportunities for students to apply their learning beyond the university and engage in meaningful community work.
+                            </p>
+                            <p>
+                                Over the years, AIP has continued to develop its advocacies in <strong class="font-bold text-white">Education, Environmental and Agricultural Development, Gender Equality and Social Harmony, Good Governance, and Health</strong>. Through its initiatives, the organization has fostered leadership development, community partnerships, and collaborative action. As AIP evolved, so did its internal structure. Previously composed of nine committees, the organization transitioned to five committees in the current term by merging related advocacies to strengthen coordination and encourage greater collaboration among its volunteers. Through these developments, ANGAT Iskolar PUP continues to strengthen its commitment to volunteerism, community engagement, and collective action.
+                            </p>
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            <!-- Vision Card -->
-            <div class="relative w-full h-[500px] md:h-[600px] rounded-[40px] overflow-hidden flex flex-col justify-between p-8 md:p-10 shadow-xl shadow-gray-300">
-                <div class="absolute inset-0 bg-gradient-to-b from-aip-plum/90 via-aip-plum/70 to-aip-plum/90 z-0"></div>
-                <div class="absolute inset-0 flex items-center justify-center text-white/30 z-0">
-                    <span class="text-sm font-bold uppercase tracking-widest">[Background Image Pending]</span>
-                </div>
-                <div class="relative z-10 w-full text-center mt-4">
-                    <h3 class="text-3xl font-bold text-white uppercase italic underline decoration-2 underline-offset-4 tracking-wider">OUR VISION</h3>
-                </div>
-                <div class="relative z-10 border-l-4 border-white pl-6 text-white mb-4">
-                    <p class="text-sm md:text-base lg:text-lg leading-relaxed">
-                        The organization shall envision to hone young leaders holistically who practice empathy, become agents of good governance, and promote volunteerism in communities. Angat Iskolar PUP aims to develop every Iskolar through active community participation to not only put into practice what they learned in the university but also incline their leadership towards a service-centered leadership for the people and the country.
-                    </p>
+            <!-- SLIDE 2: OUR MISSION -->
+            <div data-about-slide class="hidden animate-fade-in-up">
+                <div class="relative rounded-[2.5rem] bg-gradient-to-br from-aip-plum via-[#7a1939] to-aip-cerise text-white p-8 sm:p-12 md:p-16 shadow-2xl overflow-hidden min-h-[460px] md:min-h-[500px] flex flex-col justify-between">
+                    <!-- Decorative subtle pattern -->
+                    <div class="absolute top-0 right-0 w-80 h-80 bg-white/5 rounded-full blur-3xl pointer-events-none"></div>
+                    <div class="absolute bottom-0 left-0 w-80 h-80 bg-black/15 rounded-full blur-3xl pointer-events-none"></div>
+
+                    <div class="relative z-10 text-center pt-2">
+                        <span class="inline-block bg-white/15 backdrop-blur-md border border-white/25 text-white text-xs font-bold px-5 py-1.5 rounded-full uppercase tracking-widest mb-4">
+                            Our Purpose
+                        </span>
+                        <h2 class="text-3xl sm:text-4xl md:text-5xl font-bold uppercase tracking-wider underline decoration-white/60 decoration-2 underline-offset-8">
+                            Our Mission
+                        </h2>
+                    </div>
+
+                    <div class="relative z-10 max-w-3xl mx-auto my-auto py-8">
+                        <div class="border-l-4 border-white pl-6 sm:pl-8 py-2">
+                            <p class="text-lg sm:text-xl md:text-2xl leading-relaxed font-light text-white/95">
+                                The organization shall pursue to create a long-term community of the largest mobilization of volunteer Iskolar ng Bayan throughout the PUP system for community-based projects through the ten (10) centers of participation to actively partake in nation-building and help the marginalized sector of our society.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="relative z-10 flex items-center justify-between text-xs uppercase tracking-widest text-white/70 border-t border-white/15 pt-4">
+                        <span>ANGAT Iskolar PUP</span>
+                        <span>02 / 03</span>
+                    </div>
                 </div>
             </div>
+
+            <!-- SLIDE 3: OUR VISION -->
+            <div data-about-slide class="hidden animate-fade-in-up">
+                <div class="relative rounded-[2.5rem] bg-gradient-to-br from-[#6d1532] via-aip-plum to-aip-raspberry text-white p-8 sm:p-12 md:p-16 shadow-2xl overflow-hidden min-h-[460px] md:min-h-[500px] flex flex-col justify-between">
+                    <!-- Decorative subtle pattern -->
+                    <div class="absolute top-0 left-0 w-80 h-80 bg-white/5 rounded-full blur-3xl pointer-events-none"></div>
+                    <div class="absolute bottom-0 right-0 w-80 h-80 bg-black/15 rounded-full blur-3xl pointer-events-none"></div>
+
+                    <div class="relative z-10 text-center pt-2">
+                        <span class="inline-block bg-white/15 backdrop-blur-md border border-white/25 text-white text-xs font-bold px-5 py-1.5 rounded-full uppercase tracking-widest mb-4">
+                            Our Aspiration
+                        </span>
+                        <h2 class="text-3xl sm:text-4xl md:text-5xl font-bold uppercase tracking-wider underline decoration-white/60 decoration-2 underline-offset-8">
+                            Our Vision
+                        </h2>
+                    </div>
+
+                    <div class="relative z-10 max-w-3xl mx-auto my-auto py-8">
+                        <div class="border-l-4 border-white pl-6 sm:pl-8 py-2">
+                            <p class="text-lg sm:text-xl md:text-2xl leading-relaxed font-light text-white/95">
+                                The organization shall envision to hone young leaders holistically who practice empathy, become agents of good governance, and promote volunteerism in communities. Angat Iskolar PUP aims to develop every Iskolar through active community participation to not only put into practice what they learned in the university but also incline their leadership towards a service-centered leadership for the people and the country.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="relative z-10 flex items-center justify-between text-xs uppercase tracking-widest text-white/70 border-t border-white/15 pt-4">
+                        <span>Lagi't Lagi, Para sa Bayan</span>
+                        <span>03 / 03</span>
+                    </div>
+                </div>
+            </div>
+
         </div>
+
+        <!-- Bottom Dot Indicators + Swipe Hint -->
+        <div class="flex flex-col items-center justify-center mt-8 gap-3">
+            <div class="flex items-center gap-2.5">
+                <button
+                    type="button"
+                    data-about-dot="0"
+                    aria-label="Go to About Us slide"
+                    class="about-dot-btn h-2.5 w-8 rounded-full bg-aip-cerise transition-all duration-300 cursor-pointer"
+                ></button>
+                <button
+                    type="button"
+                    data-about-dot="1"
+                    aria-label="Go to Our Mission slide"
+                    class="about-dot-btn h-2.5 w-2.5 rounded-full bg-gray-300 hover:bg-gray-400 transition-all duration-300 cursor-pointer"
+                ></button>
+                <button
+                    type="button"
+                    data-about-dot="2"
+                    aria-label="Go to Our Vision slide"
+                    class="about-dot-btn h-2.5 w-2.5 rounded-full bg-gray-300 hover:bg-gray-400 transition-all duration-300 cursor-pointer"
+                ></button>
+            </div>
+            <p class="text-xs text-gray-400 font-medium sm:hidden">
+                Swipe left or right, or tap arrows to explore
+            </p>
+        </div>
+
     </div>
 </BaseLayout>
+
+<script>
+    document.addEventListener('astro:page-load', () => {
+        const slides = document.querySelectorAll('[data-about-slide]');
+        const tabBtns = document.querySelectorAll('.about-tab-btn');
+        const dotBtns = document.querySelectorAll('.about-dot-btn');
+        const prevBtn = document.getElementById('about-prev-btn');
+        const nextBtn = document.getElementById('about-next-btn');
+        const counter = document.getElementById('about-slide-counter');
+        const sliderTrack = document.getElementById('about-slider-track');
+
+        if (slides.length === 0) return;
+
+        let currentSlide = 0;
+
+        const goToSlide = (index: number) => {
+            const total = slides.length;
+            currentSlide = ((index % total) + total) % total;
+
+            slides.forEach((slide, idx) => {
+                if (idx === currentSlide) {
+                    slide.classList.remove('hidden');
+                    slide.classList.add('block');
+                } else {
+                    slide.classList.add('hidden');
+                    slide.classList.remove('block');
+                }
+            });
+
+            tabBtns.forEach((btn, idx) => {
+                if (idx === currentSlide) {
+                    btn.classList.remove('bg-transparent', 'text-gray-600', 'hover:text-aip-plum', 'hover:bg-gray-50');
+                    btn.classList.add('bg-aip-cerise', 'text-white', 'shadow-sm');
+                } else {
+                    btn.classList.remove('bg-aip-cerise', 'text-white', 'shadow-sm');
+                    btn.classList.add('bg-transparent', 'text-gray-600', 'hover:text-aip-plum', 'hover:bg-gray-50');
+                }
+            });
+
+            dotBtns.forEach((dot, idx) => {
+                if (idx === currentSlide) {
+                    dot.classList.remove('w-2.5', 'bg-gray-300', 'hover:bg-gray-400');
+                    dot.classList.add('w-8', 'bg-aip-cerise');
+                } else {
+                    dot.classList.remove('w-8', 'bg-aip-cerise');
+                    dot.classList.add('w-2.5', 'bg-gray-300', 'hover:bg-gray-400');
+                }
+            });
+
+            if (counter) {
+                counter.textContent = `${currentSlide + 1} / ${total}`;
+            }
+        };
+
+        prevBtn?.addEventListener('click', () => goToSlide(currentSlide - 1));
+        nextBtn?.addEventListener('click', () => goToSlide(currentSlide + 1));
+
+        tabBtns.forEach((btn, idx) => {
+            btn.addEventListener('click', () => goToSlide(idx));
+        });
+
+        dotBtns.forEach((dot, idx) => {
+            dot.addEventListener('click', () => goToSlide(idx));
+        });
+
+        // Touch swipe support for mobile devices
+        if (sliderTrack) {
+            let touchStartX = 0;
+            sliderTrack.addEventListener('touchstart', (e) => {
+                touchStartX = e.changedTouches[0].screenX;
+            }, { passive: true });
+
+            sliderTrack.addEventListener('touchend', (e) => {
+                const touchEndX = e.changedTouches[0].screenX;
+                const deltaX = touchEndX - touchStartX;
+                if (Math.abs(deltaX) > 45) {
+                    if (deltaX < 0) {
+                        goToSlide(currentSlide + 1);
+                    } else {
+                        goToSlide(currentSlide - 1);
+                    }
+                }
+            }, { passive: true });
+        }
+    });
+</script>
