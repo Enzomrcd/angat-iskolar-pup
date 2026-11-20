@@ -1,8 +1,11 @@
 # public/admin/config.yml
 backend:
-  name: git-gateway
+  name: github
+  repo: Enzomrcd/angat-iskolar-pup
   branch: main
-  
+  base_url: https://angat-iskolar-pup.vercel.app
+  auth_endpoint: api/auth
+
 local_backend: true
 
 media_folder: "public/images/uploads"
@@ -49,7 +52,7 @@ collections:
       - { label: "Main Cover Image", name: "image", widget: "image", required: false }
       - { label: "Short Excerpt (Card Summary)", name: "excerpt", widget: "text", required: false }
       - { label: "General Program Overview", name: "body", widget: "markdown" }
-      
+
       # Annual Editions (Supports multiple runs per year under the same Year tab)
       - label: "Annual Editions (For Flagship Programs)"
         name: "editions"
