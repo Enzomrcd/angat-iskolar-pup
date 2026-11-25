@@ -1,8 +1,9 @@
 ---
-title: "General Assembly"
-category: "Organizational Engagement"
-date: 2026-08-15
+title: General Assembly
+program_type: Flagship Program
+category: Organizational Engagement
 image: ""
+date: ""
 ---
 The ANGAT Iskolar PUP General Assembly is a gathering of all members of the organization, serving as a platform for organizational engagement, collective learning, and solidarity among its Volunteers ng Bayan. It aims to strengthen the members' sense of belonging, reinforce their shared commitment to the organization's principles and objectives, and provide an avenue for everyone to reconnect, interact, and collectively envision the direction of ANGAT Iskolar PUP.
 
